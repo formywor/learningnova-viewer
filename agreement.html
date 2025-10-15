@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ScriptNova — Organization/School Opt-Out Agreement</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060e19; --bg2:#0a1526; --card:rgba(255,255,255,.06);
+    --ink:#eaf2fa; --muted:#a6b3c1; --accent:#7dd3fc; --accent2:#34d399;
+    --ring:rgba(125,211,252,.45); --danger:#ef4444; --ok:#22c55e; --warn:#f59e0b;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+    color:var(--ink); background:
+      radial-gradient(1200px 600px at 20% -10%, #11213a 0%, transparent 60%),
+      radial-gradient(900px 600px at 90% 10%, #0b2842 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg), var(--bg2));
+    background-attachment: fixed;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:24px}
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg, rgba(6,14,25,.9), rgba(6,14,25,.65));backdrop-filter: blur(8px);border-bottom:1px solid rgba(125,211,252,.15)}
+  header .bar{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 24px}
+  .logo{font-weight:800;letter-spacing:.3px}
+  .pill{border:1px solid rgba(255,255,255,.15);padding:4px 10px;border-radius:999px;color:var(--muted);font-size:.85rem}
+  .content{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;margin-top:20px}
+  h1{margin:.2em 0 .4em 0;font-size:1.9rem}
+  h2{margin:1.6em 0 .6em;font-size:1.3rem;color:#dbeafe}
+  h3{margin:1.2em 0 .5em;font-size:1.05rem;color:#c7d2fe}
+  p{line-height:1.7;color:#d7e2ee}
+  ul,ol{line-height:1.7;color:#d7e2ee}
+  .callout{border-left:4px solid var(--accent);background:rgba(125,211,252,.08);padding:14px 16px;border-radius:8px;margin:16px 0}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:900px){.grid{grid-template-columns:2fr 1fr}}
+  .box{background:#0c1729;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px}
+  .muted{color:var(--muted)}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);margin:22px 0}
+  .list-tight li{margin:.35em 0}
+  .agree-guard{display:flex;gap:10px;align-items:flex-start;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);padding:12px 14px;border-radius:10px}
+  .agree-guard input{margin-top:.25rem}
+  form{display:grid;gap:14px}
+  label{font-weight:600}
+  input,select,textarea{
+    width:100%;background:#07101c;color:var(--ink);border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;padding:10px 12px;outline:none
+  }
+  textarea{min-height:140px;resize:vertical}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring)}
+  .row{display:grid;gap:12px}
+  @media(min-width:780px){.row{grid-template-columns:1fr 1fr}}
+  .btn{
+    border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg,#1a2b44,#13243b);
+    padding:12px 16px;border-radius:12px;color:white;font-weight:700;cursor:pointer;display:inline-flex;gap:10px;align-items:center;justify-content:center
+  }
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .btn.primary{background:linear-gradient(180deg,#1b4760,#15384e);border-color:rgba(125,211,252,.35)}
+  .btn.danger{background:linear-gradient(180deg,#5e1a1a,#421515);border-color:rgba(239,68,68,.45)}
+  .badge{font-size:.8rem;border:1px solid rgba(255,255,255,.18);padding:2px 8px;border-radius:999px;color:#cbd5e1}
+  .note{font-size:.9rem;color:#b9c7d6}
+  .small{font-size:.85rem}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .success{color:var(--ok)}
+  .error{color:var(--danger)}
+  .hidden{display:none!important}
+  .table{width:100%;border-collapse:collapse}
+  .table th,.table td{border-bottom:1px solid rgba(255,255,255,.08);padding:10px 8px;text-align:left}
+  .sticky-bottom{position:sticky;bottom:0;background:linear-gradient(180deg, rgba(10,21,38,.2), rgba(10,21,38,.75));backdrop-filter: blur(8px);padding:12px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px}
+  .req::after{content:" *";color:#fda4af;font-weight:800}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo">🛡️ <strong>ScriptNova</strong> Opt-Out Agreement</div>
+    <div class="pill">Policy • Compliance • Privacy</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="content">
+    <h1>Organization/School Opt-Out Agreement (ScriptNova)</h1>
+    <p class="muted small">Version 1.0 • Last updated: <span id="today"></span> • This Agreement governs the process by which an educational institution, district, or organization (“<strong>Requester</strong>”) elects to opt out of ScriptNova services for some or all of its users.</p>
+
+    <div class="callout">
+      <strong>Notice:</strong> One (1) school is currently <em>opted out by default</em> and was reviewed and approved by ScriptNova admin <strong>David Y</strong>. Approved opt-outs are listed below for transparency.
+    </div>
+
+    <div class="grid">
+      <div class="box">
+        <h2>1. Purpose and Scope</h2>
+        <p>This Organization/School Opt-Out Agreement (“<strong>Agreement</strong>”) establishes the terms, assurances, and representations under which the Requester instructs ScriptNova to disable, restrict, or cease service provision for covered users, systems, devices, and/or networks under the Requester’s control. This Agreement applies to ScriptNova websites, applications, APIs, integrations, and related services (“<strong>Services</strong>”).</p>
+
+        <h2>2. Definitions</h2>
+        <ul class="list-tight">
+          <li><strong>Requester</strong>: The educational institution, district, or organization submitting a valid opt-out request.</li>
+          <li><strong>Covered Users</strong>: Students, staff, contractors, or affiliates under the Requester’s authority and within scope of the opt-out.</li>
+          <li><strong>Opt-Out</strong>: A directive to ScriptNova to restrict or disable the Services for Covered Users, subject to technical feasibility.</li>
+          <li><strong>Personal Data</strong> / <strong>Personally Identifiable Information (PII)</strong>: Any information that identifies or can reasonably identify a natural person, consistent with applicable laws.</li>
+        </ul>
+
+        <h2>3. Legal and Regulatory Context (Informational Only)</h2>
+        <p><em>Nothing in this section is legal advice.</em> Requester remains responsible for its own legal compliance. Depending on jurisdiction, the following frameworks may apply:</p>
+        <ul>
+          <li><strong>FERPA</strong> (U.S.): Protects student education records; schools/districts are data controllers of such records.</li>
+          <li><strong>COPPA</strong> (U.S.): Governs online collection from children under 13; schools may act in loco parentis in limited contexts.</li>
+          <li><strong>CCPA/CPRA</strong> (California): Provides rights to California residents regarding personal information; applies to certain entities/processors.</li>
+          <li><strong>GDPR</strong> (EU/EEA): Sets obligations for controllers/processors of personal data and data subject rights, with potential extra-territorial scope.</li>
+          <li>Other state/provincial, national, and sector-specific privacy and security laws may apply.</li>
+        </ul>
+
+        <h2>4. Representations and Authority</h2>
+        <ol>
+          <li>Requester represents it has lawful authority to bind the institution and to direct ScriptNova to implement the Opt-Out for Covered Users.</li>
+          <li>Requester warrants its request is accurate, complete, and within its jurisdictional and contractual rights.</li>
+          <li>Requester agrees to indemnify ScriptNova for claims arising from inaccuracies in authority or scope of the request.</li>
+        </ol>
+
+        <h2>5. Scope of Opt-Out</h2>
+        <p>Requester may elect to opt out by domain(s), email suffix(es), IP/CIDR ranges, device IDs, SIS rosters, or other identifiers. The <em>scope</em> provided below in the submission form becomes incorporated into this Agreement upon acceptance by ScriptNova.</p>
+
+        <h2>6. Service Limitations and Technical Feasibility</h2>
+        <p>ScriptNova will make commercially reasonable efforts to implement the Opt-Out promptly upon verification. Some functionality may be technically infeasible to disable in full (e.g., content available on the open internet, third-party caches, or services outside ScriptNova’s control). ScriptNova will document any limitations in its approval response.</p>
+
+        <h2>7. Data Handling, Deletion, and Retention</h2>
+        <ol>
+          <li>Upon a valid Opt-Out, ScriptNova will cease new processing for Covered Users within scope and begin suppression/deny-lists as technically feasible.</li>
+          <li>Existing logs/records may be retained for security, audit, legal defense, or compliance for a limited retention period, after which they will be minimized or deleted consistent with ScriptNova policy.</li>
+          <li>Requester may submit specific deletion directives where applicable law grants such rights; ScriptNova will evaluate and respond accordingly.</li>
+        </ol>
+
+        <h2>8. Security and Incident Response</h2>
+        <p>ScriptNova maintains reasonable technical and organizational measures designed to protect data against unauthorized access, disclosure, alteration, and destruction. In the event of a security incident affecting Covered Users, ScriptNova will notify Requester consistent with its incident response procedures and applicable law.</p>
+
+        <h2>9. No Admission; No Waiver</h2>
+        <p>Implementation of an Opt-Out is not an admission of non-compliance by either party and shall not waive any rights, defenses, or objections available at law or in equity.</p>
+
+        <h2>10. Mutual Cooperation</h2>
+        <p>Requester agrees to cooperate in verifying organizational control (e.g., email/domain validation, DNS TXT record, signed letter on letterhead, or comparable proof). ScriptNova agrees to act in good faith to implement the Opt-Out without undue delay after verification.</p>
+
+        <h2>11. Third-Party Services and Links</h2>
+        <p>To the extent the Services interface with third-party platforms, Requester acknowledges ScriptNova cannot dictate those platforms’ independent practices; the Opt-Out will apply to ScriptNova’s own systems and integrations under its control.</p>
+
+        <h2>12. Disclaimer of Warranties</h2>
+        <p>THE SERVICES ARE PROVIDED “AS IS.” SCRIPTNOVA DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY LAW.</p>
+
+        <h2>13. Limitation of Liability</h2>
+        <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, NEITHER PARTY SHALL BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES. SCRIPTNOVA’S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL NOT EXCEED USD $100 OR THE AMOUNTS PAID BY REQUESTER FOR THE SERVICES IN THE 12 MONTHS PRECEDING THE CLAIM, WHICHEVER IS GREATER.</p>
+
+        <h2>14. Term, Termination, and Reversal</h2>
+        <ul>
+          <li>This Agreement is effective upon ScriptNova’s written approval of the Requester’s submission.</li>
+          <li>Requester may request reversal (opt-in) in writing by an authorized representative, subject to re-verification.</li>
+          <li>ScriptNova may suspend or terminate this Agreement if the submission was fraudulent, unlawful, or materially misleading.</li>
+        </ul>
+
+        <h2>15. Notices</h2>
+        <p>Formal notices may be provided via verified organizational email, signed PDF on official letterhead, or other mutually agreed channels. Operational confirmations (including status updates) may be provided via the contact details submitted below.</p>
+
+        <h2>16. Governing Law and Venue</h2>
+        <p>Unless otherwise required by applicable law, this Agreement will be governed by the laws of the State in which ScriptNova principally operates, excluding conflict-of-law rules. Venue will lie in the courts of competent jurisdiction in that State.</p>
+
+        <h2>17. Entire Agreement; Order of Precedence</h2>
+        <p>This Agreement, together with any incorporated forms or written approvals, constitutes the entire agreement with respect to the Opt-Out. In case of conflict between this Agreement and any conflicting terms on general marketing pages, this Agreement controls.</p>
+
+        <h2>18. Amendments and Updates</h2>
+        <p>ScriptNova may update this Agreement to reflect legal or operational changes. Material changes will be published, and continued use of the Opt-Out process after publication constitutes acceptance of the updated terms.</p>
+
+        <div class="hr"></div>
+
+        <div class="agree-guard">
+          <input type="checkbox" id="readAgreement" />
+          <label for="readAgreement">
+            I have read and understood the Agreement above and I am authorized to submit an Opt-Out on behalf of my organization/school.
+          </label>
+        </div>
+
+        <div class="sticky-bottom">
+          <span class="small muted">You must confirm you’ve read the Agreement to unlock the submission form.</span>
+          <button class="btn" id="jumpToForm">Go to submission form</button>
+        </div>
+      </div>
+
+      <aside class="box" aria-labelledby="approvedList">
+        <h2 id="approvedList">Approved Opt-Outs (Public Record)</h2>
+        <table class="table small">
+          <thead>
+            <tr><th>Organization/School</th><th>Status</th><th>Approved By</th><th>Effective</th></tr>
+          </thead>
+          <tbody id="approvedTbody">
+            <tr>
+              <td><span class="mono">[Redacted Name #1]</span> <span class="badge">Default opt-out</span></td>
+              <td>Approved</td>
+              <td>Admin <strong>David Y</strong></td>
+              <td><span id="approvedDate"></span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="note">For privacy, public entries may display a redacted name unless the Requester consents to full disclosure. Additional approved entries appear as they are processed.</p>
+      </aside>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="box">
+      <h2>Submit Organization/School Opt-Out Request</h2>
+      <p class="muted small">Complete all required fields. Submissions are verified before enforcement. False or unauthorized submissions may be rejected.</p>
+
+      <form id="optoutForm" novalidate>
+        <!-- Honeypot -->
+        <div class="hidden">
+          <label for="hp">Leave this field empty</label>
+          <input id="hp" name="hp" type="text" autocomplete="off" />
+        </div>
+
+        <div class="row">
+          <div>
+            <label class="req" for="orgName">Organization/School Name</label>
+            <input id="orgName" name="orgName" required maxlength="160" placeholder="e.g., North Valley Unified School District" />
+          </div>
+          <div>
+            <label class="req" for="officialRole">Your Official Role/Title</label>
+            <input id="officialRole" name="officialRole" required maxlength="120" placeholder="e.g., Director of IT" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label class="req" for="contactName">Your Full Name</label>
+            <input id="contactName" name="contactName" required maxlength="120" placeholder="First Last" />
+          </div>
+          <div>
+            <label class="req" for="email">Official Email</label>
+            <input id="email" name="email" type="email" required maxlength="180" placeholder="you@district.k12.us" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="orgDomain" class="req">Organization Email Domain</label>
+            <input id="orgDomain" name="orgDomain" required maxlength="120" placeholder="district.k12.us" />
+          </div>
+          <div>
+            <label for="phone">Contact Phone</label>
+            <input id="phone" name="phone" type="tel" maxlength="40" placeholder="+1 (555) 555-5555" />
+          </div>
+        </div>
+
+        <div>
+          <label for="address">Organization Mailing Address</label>
+          <input id="address" name="address" maxlength="200" placeholder="Street, City, State/Province, Postal Code, Country" />
+        </div>
+
+        <div class="row">
+          <div>
+            <label class="req" for="effectiveDate">Requested Effective Date</label>
+            <input id="effectiveDate" name="effectiveDate" type="date" required />
+          </div>
+          <div>
+            <label for="scope">Scope of Opt-Out</label>
+            <select id="scope" name="scope">
+              <option value="all">All users under org domain</option>
+              <option value="students">Students only</option>
+              <option value="staff">Staff only</option>
+              <option value="custom">Custom (describe below)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="req" for="description">Description / Justification</label>
+          <textarea id="description" name="description" required maxlength="4000" placeholder="Explain why you want to opt out (legal basis, policy alignment, parent/guardian directives, etc.)"></textarea>
+        </div>
+
+        <div>
+          <label for="otherDetails">Other Details (optional)</label>
+          <textarea id="otherDetails" name="otherDetails" maxlength="4000" placeholder="IP ranges, email suffixes, device IDs, roster references, SIS IDs, etc."></textarea>
+        </div>
+
+        <div class="row">
+          <div>
+            <label class="req" for="signature">Digital Signature (type full name)</label>
+            <input id="signature" name="signature" required maxlength="120" placeholder="Type your full name to sign" />
+          </div>
+          <div>
+            <label class="req" for="authAttest">Authority Attestation</label>
+            <select id="authAttest" name="authAttest" required>
+              <option value="">Select one…</option>
+              <option>I am authorized to bind my organization</option>
+              <option>I am not authorized (will attach signed letter)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="agree-guard">
+          <input type="checkbox" id="confirmRead" />
+          <label for="confirmRead">I confirm I have read the Agreement above and that the information provided is accurate and truthful.</label>
+        </div>
+
+        <div class="row">
+          <button class="btn primary" id="submitBtn" type="submit" disabled>Submit Opt-Out Request</button>
+          <button class="btn danger" type="reset">Clear</button>
+        </div>
+
+        <div id="formStatus" class="small muted" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dates for display
+  const today = new Date();
+  document.getElementById('today').textContent = today.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('approvedDate').textContent = today.toLocaleDateString();
+
+  // Scroll/jump helpers
+  document.getElementById('jumpToForm').addEventListener('click', () => {
+    document.getElementById('optoutForm').scrollIntoView({behavior:'smooth'});
+  });
+
+  // Gate the form behind 'readAgreement' checkbox
+  const readAgreement = document.getElementById('readAgreement');
+  const confirmRead   = document.getElementById('confirmRead');
+  const submitBtn     = document.getElementById('submitBtn');
+  const form          = document.getElementById('optoutForm');
+  const statusEl      = document.getElementById('formStatus');
+
+  function toggleSubmit(){
+    submitBtn.disabled = !(readAgreement.checked && confirmRead.checked);
+  }
+  readAgreement.addEventListener('change', toggleSubmit);
+  confirmRead.addEventListener('change', toggleSubmit);
+
+  // Basic client-side validation helpers
+  function invalid(msg){
+    statusEl.innerHTML = '<span class="error">✖ ' + msg + '</span>';
+  }
+  function info(msg){
+    statusEl.innerHTML = '<span class="success">✔ ' + msg + '</span>';
+  }
+
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1395130152584876195/inn8hj4U9DFU8Q1ppNBdsJx8vDgCYF1WhC7bf49ECQmRLMAE9eT7j5Q9Jcf49ny-9Gxc";
+
+  // Submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusEl.textContent = '';
+
+    // Honeypot
+    if (form.hp.value) {
+      invalid("Bot detection triggered.");
+      return;
+    }
+
+    // Required fields
+    const reqIds = ['orgName','officialRole','contactName','email','orgDomain','effectiveDate','description','signature','authAttest'];
+    for (const id of reqIds){
+      const el = document.getElementById(id);
+      if (!el.value || (id==='authAttest' && !el.value.trim())) {
+        el.focus();
+        invalid("Please complete all required fields.");
+        return;
+      }
+    }
+    // Email format check
+    const email = document.getElementById('email').value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      invalid("Please provide a valid official email address.");
+      return;
+    }
+    // Domain looks like a domain
+    const domain = document.getElementById('orgDomain').value.trim();
+    if (!/^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(domain)){
+      invalid("Please provide a valid organization domain (e.g., district.k12.us).");
+      return;
+    }
+    if (!(readAgreement.checked && confirmRead.checked)){
+      invalid("Confirm you have read and agree to the terms.");
+      return;
+    }
+
+    const payload = {
+      username: "ScriptNova Opt-Outs",
+      avatar_url: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f6e1.svg",
+      embeds: [{
+        title: "New Opt-Out Request",
+        color: 0x34d399,
+        timestamp: new Date().toISOString(),
+        fields: [
+          { name: "Organization/School", value: form.orgName.value.trim().slice(0, 256) || "—", inline: true },
+          { name: "Official Role", value: form.officialRole.value.trim().slice(0, 256) || "—", inline: true },
+          { name: "Contact Name", value: form.contactName.value.trim().slice(0, 256) || "—", inline: true },
+          { name: "Official Email", value: email, inline: true },
+          { name: "Org Domain", value: domain, inline: true },
+          { name: "Phone", value: (form.phone.value || "—").slice(0, 128), inline: true },
+          { name: "Address", value: (form.address.value || "—").slice(0, 1024) },
+          { name: "Requested Effective Date", value: form.effectiveDate.value || "—", inline: true },
+          { name: "Scope", value: form.scope.value || "—", inline: true },
+          { name: "Authority Attestation", value: form.authAttest.value || "—", inline: true },
+          { name: "Description / Justification", value: (form.description.value || "—").slice(0, 4000) },
+          { name: "Other Details", value: (form.otherDetails.value || "—").slice(0, 4000) },
+          { name: "Digital Signature", value: form.signature.value.trim().slice(0, 256) }
+        ],
+        footer: { text: "ScriptNova • Compliance Intake" }
+      }]
+    };
+
+    submitBtn.disabled = true;
+    statusEl.innerHTML = "Submitting… please wait.";
+
+    try{
+      const resp = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok){
+        const text = await resp.text().catch(()=> '');
+        throw new Error("Webhook error: " + resp.status + " " + text);
+      }
+      info("Submitted successfully. We’ll review and follow up via your official email.");
+      form.reset();
+      submitBtn.disabled = true;
+      readAgreement.checked = false;
+      confirmRead.checked = false;
+      window.scrollTo({top:0,behavior:'smooth'});
+    }catch(err){
+      console.error(err);
+      invalid("Submission failed. If this persists, contact ScriptNova support.");
+      submitBtn.disabled = false;
+    }
+  });
+
+  // Accessibility: flag required fields on invalid input
+  document.querySelectorAll('input[required],textarea[required],select[required]').forEach(el=>{
+    el.addEventListener('invalid', () => el.setAttribute('aria-invalid','true'));
+    el.addEventListener('input',  () => el.removeAttribute('aria-invalid'));
+  });
+</script>
+</body>
+</html>
