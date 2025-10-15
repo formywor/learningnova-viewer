@@ -1,395 +1,428 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Room Join (Authorized Front-End)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Room Join (Clean Frontend)</title>
+  <meta property="og:type" content="website" />
+  <meta name="description" content="Clean, ad-free front-end for joining authorized Blooket rooms." />
+
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
-  <meta name="description" content="Clean, ad-free, front-end client for joining rooms using an officially supported method."/>
+
   <style>
     :root{
-      --bg:#0b1220;--panel:#111a2b;--panel2:#0e1726;--text:#e9eefc;--muted:#a8b3cf;
-      --brand:#5b8cff;--brand2:#6f97ff;--ring:rgba(123,168,255,.5);--ok:#17c964;--warn:#f5a524;--err:#e5484d;
+      --bg:#0b1220;--panel:#10192b;--panel2:#0e1728;--text:#eef2ff;--muted:#9fb0cf;
+      --brand:#5b8cff;--brand2:#6f97ff;--ok:#17c964;--warn:#f5a524;--err:#e5484d;--ring:rgba(123,168,255,.5)
     }
-    *{box-sizing:border-box} html,body{height:100%}
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;font-family:Nunito,system-ui,Segoe UI,Roboto,Helvetica,Arial;
       background:
-        radial-gradient(1200px 1200px at 120% -20%,#223458 0%,transparent 60%),
-        radial-gradient(900px 800px at -10% 120%,#162443 0%,transparent 60%),
-        linear-gradient(180deg,#0b1220,#090f1d);
+        radial-gradient(1000px 1000px at 120% -10%, #223458 0%, transparent 60%),
+        radial-gradient(800px 800px at -15% 120%, #162443 0%, transparent 60%),
+        linear-gradient(180deg,#0b1220,#0a1020);
       color:var(--text);
       -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
     }
-    .shell{min-height:100%;display:grid;grid-template-rows:auto 1fr auto}
-    header{padding:24px 16px}
-    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
-    .logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 10px 28px rgba(91,140,255,.35)}
-    .subtitle{color:var(--muted);font-weight:700;font-size:12px;margin-top:4px}
-    main{padding:16px;display:grid;gap:16px;max-width:860px;margin:0 auto;width:100%}
+
+    .wrap{max-width:880px;margin:0 auto;padding:28px 16px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--brand),var(--brand2));font-weight:900;box-shadow:0 10px 26px rgba(91,140,255,.35)}
+    .title{font-weight:900;font-size:20px}
+    .sub{font-size:12px;color:var(--muted);margin-top:2px}
+
     .card{
       background:linear-gradient(180deg,var(--panel),var(--panel2));
-      border:1px solid rgba(255,255,255,.06); border-radius:16px; overflow:hidden;
-      box-shadow:0 16px 48px rgba(2,12,33,.6), inset 0 1px 0 rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;overflow:hidden;margin-top:14px;
+      box-shadow:0 18px 48px rgba(2,12,33,.6), inset 0 1px 0 rgba(255,255,255,.04);
     }
-    .card__head{padding:18px;border-bottom:1px solid rgba(255,255,255,.06)}
-    .card__title{margin:0;font-size:18px;font-weight:900;letter-spacing:.3px}
-    .card__body{padding:18px;display:grid;gap:14px}
-    .row{display:grid;gap:12px}
-    @media(min-width:720px){.row--2{grid-template-columns:1fr 1fr}}
+    .head{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:900}
+    .body{padding:16px;display:grid;gap:14px}
+
+    .grid{display:grid;gap:12px}
+    .g2{grid-template-columns:1fr}
+    @media(min-width:720px){.g2{grid-template-columns:1fr 1fr}}
+
     label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
     .input input{
       width:100%;padding:12px 14px;background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.09); color:var(--text); border-radius:12px;
-      outline:none; font-weight:800; transition:.2s border,.2s box-shadow,.2s background;
+      border:1px solid rgba(255,255,255,.09);color:var(--text);border-radius:12px;outline:none;font-weight:800;
+      transition:.2s border,.2s box-shadow,.2s background;
     }
-    .input input:focus{
-      border-color:rgba(123,168,255,.6); box-shadow:0 0 0 4px var(--ring); background:rgba(255,255,255,.07)
-    }
+    .input input:focus{border-color:rgba(123,168,255,.6);box-shadow:0 0 0 4px var(--ring);background:rgba(255,255,255,.07)}
+
     .switch{display:flex;align-items:center;gap:10px}
     .switch input{display:none}
-    .switch .track{width:52px;height:28px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);position:relative}
-    .switch .thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.25s transform;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    .track{width:52px;height:28px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);position:relative}
+    .thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.25s transform;box-shadow:0 6px 16px rgba(0,0,0,.25)}
     .switch input:checked + .track{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent}
     .switch input:checked + .track .thumb{transform:translateX(24px)}
+
     .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;transition:transform .06s,opacity .2s,box-shadow .2s}
     .btn:active{transform:translateY(1px) scale(.995)}
     .btn--ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:var(--text)}
     .btn--primary{background:linear-gradient(135deg,#bcd0ff,#8fb0ff 60%,#6f97ff);color:#0b1220;box-shadow:0 14px 28px rgba(91,140,255,.35)}
-    .hint{font-size:13px;color:var(--muted)}
-    footer{padding:24px 16px 34px;text-align:center;color:var(--muted);font-size:13px}
-    .toast{position:fixed;inset-inline:0;bottom:18px;display:grid;place-items:center;pointer-events:none}
-    .toast__inner{pointer-events:auto;background:#0f1a31;border:1px solid rgba(255,255,255,.09);padding:12px 14px;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.45);font-weight:800}
+
     .status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
-    .status .dot{width:8px;height:8px;border-radius:50%}
-    .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.err{background:var(--err)}
+    .dot{width:8px;height:8px;border-radius:50%}
+    .ok{background:var(--ok)} .warn{background:var(--warn)} .err{background:var(--err)}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
     .error{color:#ffadad}
-    .small{font-size:12px;color:var(--muted)}
+    .hint{font-size:13px;color:var(--muted)}
+
+    .errorBar{
+      position:fixed;left:0;right:0;bottom:-70px;z-index:50;
+      color:#fff;background-color:#e84135;min-height:55px;padding:12px 16px;
+      display:flex;align-items:center;justify-content:center;font-weight:800;
+      transition:.2s transform;transform:translateY(0)
+    }
+    .errorBar.show{transform:translateY(-70px)}
   </style>
 </head>
 <body>
-  <div class="shell">
+  <div class="wrap">
     <header>
-      <div class="brand">
-        <div class="logo">★</div>
-        <div>
-          <div>Authorized Room Join</div>
-          <div class="subtitle">Ad-free • No social links • Front-end only</div>
-        </div>
+      <div class="logo">★</div>
+      <div>
+        <div class="title">Authorized Room Join</div>
+        <div class="sub">Ad-free • No social links • Front-end only</div>
       </div>
     </header>
 
-    <main>
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">Join a Room</h2></div>
-        <div class="card__body">
-          <!-- STATUS -->
-          <div class="status" id="status">
-            <span class="dot warn" id="status-dot"></span>
-            <span id="status-text">Mock Mode is ON (no network calls)</span>
-          </div>
-
-          <!-- FORM -->
-          <div class="row row--2">
-            <div>
-              <label for="room">Room code</label>
-              <div class="input"><input id="room" placeholder="e.g. 123-456" maxlength="12" inputmode="numeric" autocomplete="off"/></div>
-            </div>
-            <div>
-              <label for="name">Display name</label>
-              <div class="input"><input id="name" placeholder="Your name" maxlength="24" autocomplete="off"/></div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="switch" role="switch" aria-checked="true" tabindex="0" id="sw-friendly-wrap">
-              <input type="checkbox" id="sw-friendly" checked/>
-              <span class="track"><span class="thumb"></span></span>
-              <span>Friendly-name check (A–Z, 0–9, space, - and _)</span>
-            </div>
-            <div class="switch" role="switch" aria-checked="true" tabindex="0" id="sw-remember-wrap">
-              <input type="checkbox" id="sw-remember" checked/>
-              <span class="track"><span class="thumb"></span></span>
-              <span>Remember last used name/code on this device</span>
-            </div>
-            <div class="switch" role="switch" aria-checked="true" tabindex="0" id="sw-mock-wrap">
-              <input type="checkbox" id="sw-mock" checked/>
-              <span class="track"><span class="thumb"></span></span>
-              <span>Mock Mode (disable real API calls)</span>
-            </div>
-          </div>
-
-          <p class="hint">
-            This page calls your official “join room” endpoint when Mock Mode is OFF. Configure the API details below.
-            When Mock Mode is ON, no network calls are made, but you can test the UX.
-          </p>
-
-          <!-- ACTIONS -->
-          <div class="actions">
-            <button class="btn btn--ghost" id="btn-clear">Clear</button>
-            <button class="btn btn--primary" id="btn-join">Join Room</button>
-          </div>
-
-          <!-- OUTPUT -->
-          <div id="out" class="small mono"></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card__head"><h2 class="card__title">API Configuration</h2></div>
-        <div class="card__body">
-          <p class="hint">Plug in your officially supported, browser-safe details. If any value requires a secret, don’t put it here—use a server proxy instead.</p>
-          <div class="row row--2">
-            <div>
-              <label for="cfg-url">Base URL</label>
-              <div class="input"><input id="cfg-url" placeholder="https://api.example.com" autocomplete="off"/></div>
-            </div>
-            <div>
-              <label for="cfg-path">Join path</label>
-              <div class="input"><input id="cfg-path" placeholder="/rooms/{roomCode}/join" autocomplete="off"/></div>
-            </div>
-          </div>
-          <div class="row row--2">
-            <div>
-              <label for="cfg-method">HTTP method</label>
-              <div class="input"><input id="cfg-method" placeholder="POST" value="POST" autocomplete="off"/></div>
-            </div>
-            <div>
-              <label for="cfg-key">Client key / token (optional, non-secret)</label>
-              <div class="input"><input id="cfg-key" placeholder="e.g. public_client_token_abc" autocomplete="off"/></div>
-            </div>
-          </div>
-          <div class="row">
-            <label for="cfg-body">Request body template (JSON)</label>
+    <!-- JOIN CARD -->
+    <section class="card">
+      <div class="head">Join a Room</div>
+      <div class="body">
+        <!-- keeps old IDs for compatibility -->
+        <div class="grid g2">
+          <div>
+            <label for="gcode">Enter code</label>
             <div class="input">
-              <input id="cfg-body" class="mono" autocomplete="off"
-                     value='{"name":"${name}","code":"${roomCode}"}'/>
+              <input id="gcode" class="idInput" placeholder="Game ID" maxlength="12" inputmode="numeric" autocomplete="off" />
             </div>
           </div>
-          <div class="row">
-            <label for="cfg-hdrs">Extra headers (JSON)</label>
+          <div>
+            <label for="gname">Nickname</label>
             <div class="input">
-              <input id="cfg-hdrs" class="mono" autocomplete="off"
-                     value='{"Content-Type":"application/json"}'/>
+              <input id="gname" class="nameInput" placeholder="Nickname" maxlength="24" autocomplete="off" />
             </div>
           </div>
-          <div class="actions">
-            <button class="btn btn--ghost" id="btn-save">Save Config</button>
-            <button class="btn btn--ghost" id="btn-reset">Reset</button>
-            <button class="btn btn--primary" id="btn-test">Test Connectivity</button>
-          </div>
-          <div id="cfg-out" class="small mono"></div>
         </div>
-      </section>
-    </main>
 
-    <footer>Front-end only • No ads • No social links</footer>
+        <div class="grid">
+          <!-- Keep your old toggles/IDs so existing logic still works -->
+          <div class="switch" id="sw-incog-wrap" role="switch" aria-checked="true" tabindex="0">
+            <input type="checkbox" id="icogmode" checked />
+            <span class="track"><span class="thumb"></span></span>
+            <span>Incognito Mode</span>
+          </div>
+          <div class="switch" id="sw-bcf-wrap" role="switch" aria-checked="false" tabindex="0">
+            <input type="checkbox" id="bcf" />
+            <span class="track"><span class="thumb"></span></span>
+            <span>Bypass Filter (UI flag only)</span>
+          </div>
+          <div class="switch" id="sw-fps-wrap" role="switch" aria-checked="true" tabindex="0">
+            <input type="checkbox" id="fpswitch" checked />
+            <span class="track"><span class="thumb"></span></span>
+            <span>First Place Switch (UI flag only)</span>
+          </div>
+        </div>
+
+        <div class="status">
+          <span class="dot warn" id="status-dot"></span>
+          <span id="status-text">Configure your official endpoint below, or paste it into the URL box and Save.</span>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn--ghost" id="btn-clear">Clear</button>
+          <button class="btn btn--primary joinButton" onclick="join();" role="button"><span class="btext">Join</span></button>
+        </div>
+
+        <div id="out" class="mono" style="font-size:12px;"></div>
+      </div>
+    </section>
+
+    <!-- CONFIG CARD -->
+    <section class="card">
+      <div class="head">API Configuration</div>
+      <div class="body">
+        <p class="hint">Set your officially supported, **browser-safe** endpoint. If it needs a secret, don’t put it here.</p>
+        <div class="grid g2">
+          <div>
+            <label for="cfg-url">Join URL (full)</label>
+            <div class="input"><input id="cfg-url" placeholder="https://official.api.example/join" /></div>
+          </div>
+          <div>
+            <label for="cfg-method">HTTP Method</label>
+            <div class="input"><input id="cfg-method" value="POST" /></div>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div>
+            <label for="cfg-hdrs">Headers (JSON)</label>
+            <div class="input"><input id="cfg-hdrs" class="mono" value='{"Content-Type":"application/json"}' /></div>
+          </div>
+          <div>
+            <label for="cfg-body">Body Template (JSON)</label>
+            <div class="input"><input id="cfg-body" class="mono" value='{"code":"${code}","name":"${name}"}' /></div>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="switch" id="sw-mock-wrap" role="switch" aria-checked="false" tabindex="0">
+            <input type="checkbox" id="mockmode" />
+            <span class="track"><span class="thumb"></span></span>
+            <span>Mock Mode (use fake success without network)</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn--ghost" id="btn-save">Save</button>
+          <button class="btn btn--ghost" id="btn-reset">Reset</button>
+          <button class="btn btn--primary" id="btn-test">Test</button>
+        </div>
+        <div id="cfg-out" class="mono" style="font-size:12px;"></div>
+      </div>
+    </section>
   </div>
 
-  <div class="toast" id="toast" hidden><div class="toast__inner" id="toast-msg">Done</div></div>
+  <div class="errorBar" id="error"></div>
 
   <script>
-    /* ===================== CONFIG ===================== */
-    const DEFAULT_CONFIG = {
-      baseUrl: "https://api.example.com",             // <— put your official base URL
-      joinPath: "/rooms/{roomCode}/join",             // <— replace if different
+    /* ----------------- CONFIG ----------------- */
+    const CONFIG = {
+      joinUrl: "",                                  // <— put your official FULL join endpoint here (or save in UI)
       method: "POST",
-      headers: {"Content-Type":"application/json"},   // <— add any extra public headers
-      publicKey: "",                                  // <— only if you have a safe, browser-exposed key
-      bodyTemplate: {"name":"${name}","code":"${roomCode}"}, // <— map to your API
+      headers: {"Content-Type":"application/json"},
+      bodyTemplate: {"code":"${code}","name":"${name}"}
     };
 
-    function loadConfig(){
-      try{
-        const raw = localStorage.getItem("joiner:config");
-        if(!raw) return {...DEFAULT_CONFIG};
-        const parsed = JSON.parse(raw);
-        return {...DEFAULT_CONFIG, ...parsed};
-      }catch{ return {...DEFAULT_CONFIG}; }
-    }
-    function saveConfig(cfg){
-      localStorage.setItem("joiner:config", JSON.stringify(cfg));
-    }
-    function tplObj(obj, vars){
-      return JSON.parse(JSON.stringify(obj).replace(/\$\{(\w+)\}/g, (_,k)=>vars[k] ?? ""));
-    }
-    function buildUrl(cfg, roomCode){
-      const path = cfg.joinPath.replace("{roomCode}", encodeURIComponent(roomCode));
-      return cfg.baseUrl.replace(/\/+$/,"") + "/" + path.replace(/^\/+/,"");
-    }
+    // Load saved config (if any)
+    (function initConfigUI(){
+      const saved = loadCfg();
+      const cfg = saved || CONFIG;
 
-    /* ===================== UI HELPERS ===================== */
-    const $ = (s,r=document)=>r.querySelector(s);
-    const elOut = $("#out"), elCfgOut = $("#cfg-out");
-    const toast = $("#toast"), toastMsg = $("#toast-msg");
-    let toTimer;
-    function showToast(msg){ toastMsg.textContent=msg; toast.hidden=false; clearTimeout(toTimer); toTimer=setTimeout(()=>toast.hidden=true,2200); }
-    function setStatus(kind, text){
-      const dot = $("#status-dot"), t = $("#status-text");
-      dot.className = "dot " + (kind||"ok");
-      t.textContent = text || "";
-    }
-    function wireSwitch(wrapSel, inputSel){
-      const wrap=$(wrapSel), input=$(inputSel);
-      const sync=()=>wrap.setAttribute("aria-checked", String(input.checked));
-      wrap.addEventListener("click", ()=>{ input.checked=!input.checked; sync(); });
-      wrap.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); input.checked=!input.checked; sync(); }});
-      sync();
-    }
-    wireSwitch("#sw-friendly-wrap", "#sw-friendly");
-    wireSwitch("#sw-remember-wrap", "#sw-remember");
-    wireSwitch("#sw-mock-wrap", "#sw-mock");
+      // Prefill UI
+      document.getElementById("cfg-url").value    = cfg.joinUrl || "";
+      document.getElementById("cfg-method").value = cfg.method || "POST";
+      document.getElementById("cfg-hdrs").value   = JSON.stringify(cfg.headers||{"Content-Type":"application/json"});
+      document.getElementById("cfg-body").value   = JSON.stringify(cfg.bodyTemplate||{"code":"${code}","name":"${name}"});
 
-    const elRoom=$("#room"), elName=$("#name");
-    const elCfgUrl=$("#cfg-url"), elCfgPath=$("#cfg-path"), elCfgMethod=$("#cfg-method"), elCfgKey=$("#cfg-key"), elCfgBody=$("#cfg-body"), elCfgHdrs=$("#cfg-hdrs");
-
-    /* ===================== INIT ===================== */
-    const CFG = loadConfig();
-    elCfgUrl.value = CFG.baseUrl;
-    elCfgPath.value = CFG.joinPath;
-    elCfgMethod.value = CFG.method;
-    elCfgKey.value = CFG.publicKey || "";
-    elCfgBody.value = JSON.stringify(CFG.bodyTemplate);
-    elCfgHdrs.value = JSON.stringify(CFG.headers);
-
-    // restore last name/code
-    (()=>{
-      try{
-        const saved = JSON.parse(localStorage.getItem("launcher:last")||"null");
-        if(saved){ elRoom.value=saved.room||""; elName.value=saved.name||""; }
-      }catch{}
+      // reflect mock
+      syncStatus();
     })();
 
-    // hygiene
-    elRoom.addEventListener("input", ()=>{ elRoom.value = elRoom.value.replace(/[^\d\- ]+/g,"").replace(/\s+/g,""); });
-    elName.addEventListener("input", ()=>{ elName.value = elName.value.replace(/[\u0000-\u001F\u007F]/g,""); });
-
-    // reflect mock status
-    const syncMock = ()=>{
-      const mock = $("#sw-mock").checked;
-      setStatus(mock?"warn":"ok", mock ? "Mock Mode is ON (no network calls)" : "Mock Mode is OFF (real API calls enabled)");
-    };
-    $("#sw-mock").addEventListener("change", syncMock); syncMock();
-
-    /* ===================== JOIN ACTION ===================== */
-    async function joinRoomAPI({roomCode, name}){
-      const cfg = loadConfig();
-      const url = buildUrl(cfg, roomCode);
-      const headers = {...cfg.headers};
-      if(cfg.publicKey){ headers["X-Public-Key"] = cfg.publicKey; } // change header name if your doc says otherwise
-      const body = cfg.bodyTemplate ? tplObj(cfg.bodyTemplate, {roomCode, name}) : {roomCode, name};
-      const method = (cfg.method||"POST").toUpperCase();
-      const res = await fetch(url, {method, headers, body: method==="GET" ? undefined : JSON.stringify(body), mode:"cors", credentials:"omit"});
-      const text = await res.text();
-      let data; try{ data = JSON.parse(text); }catch{ data = {raw:text}; }
-      if(!res.ok){
-        const msg = (data && (data.error || data.message)) || ("HTTP "+res.status);
-        const err = new Error(msg); err.status = res.status; err.data = data; throw err;
-      }
-      return data;
+    function loadCfg(){
+      try{ return JSON.parse(localStorage.getItem("roomjoin:cfg") || "null"); }catch{return null}
+    }
+    function saveCfg(cfg){
+      localStorage.setItem("roomjoin:cfg", JSON.stringify(cfg));
+    }
+    function getCfg(){
+      return loadCfg() || CONFIG;
+    }
+    function tpl(json, vars){
+      return JSON.parse(JSON.stringify(json).replace(/\$\{(\w+)\}/g,(m,k)=>vars[k] ?? ""));
     }
 
-    $("#btn-join").addEventListener("click", async ()=>{
-      const roomCode = elRoom.value.trim();
-      const name = elName.value.trim();
-      if(!roomCode) return showToast("Enter a room code.");
-      if(!name) return showToast("Enter a display name.");
-      if($("#sw-friendly").checked && !/^[a-z0-9 _-]+$/i.test(name)) return showToast("Name must be letters/numbers/spaces/-/_ only.");
+    /* ----------------- OLD-ID COMPAT FUNCTIONS ----------------- */
+    function errorBar(msg){
+      const e=document.getElementById("error");
+      e.textContent=msg;
+      e.classList.add("show");
+      clearTimeout(errorBar._t);
+      errorBar._t=setTimeout(()=>e.classList.remove("show"), 3500);
+    }
 
-      if($("#sw-remember").checked){
-        try{ localStorage.setItem("launcher:last", JSON.stringify({room:roomCode, name})); }catch{}
-      } else {
-        localStorage.removeItem("launcher:last");
+    // preserve your old `join()` entry point
+    function join(){
+      const cin  = document.getElementById("gcode");
+      const name = document.getElementById("gname");
+      const incog = document.getElementById("icogmode").checked;
+      const bcf   = document.getElementById("bcf").checked;
+      const fps   = document.getElementById("fpswitch").checked;
+
+      joinGame(cin.value.trim(), name.value.trim(), incog, bcf, fps);
+    }
+
+    // NEW: in-file joinGame that calls your official endpoint
+    async function joinGame(code, name, incognito=true, bypassFilter=false, firstPlaceSwitch=true){
+      const out = document.getElementById("out");
+      out.textContent = "";
+
+      if(!code){ errorBar("Enter a code."); return; }
+      if(!name){ errorBar("Enter a nickname."); return; }
+
+      // Friendly name guard like before
+      if(!/^[a-z0-9 _-]+$/i.test(name)){
+        errorBar("Nickname must be letters/numbers/spaces/-/_ only.");
+        return;
       }
 
-      elOut.textContent = ""; // clear
-      const mock = $("#sw-mock").checked;
+      const cfg = getCfg();
+      const mock = document.getElementById("mockmode").checked;
+
+      // Set status UI
+      const dot = document.getElementById("status-dot");
+      const st  = document.getElementById("status-text");
+      function setStatus(kind, text){ dot.className = "dot " + kind; st.textContent = text; }
+
+      // Save last used
+      try{ localStorage.setItem("roomjoin:last", JSON.stringify({code,name})); }catch{}
+
+      if(mock){
+        setStatus("warn","Mock Mode: simulating success (no network)");
+        await new Promise(r=>setTimeout(r,600));
+        out.innerHTML = `<span class="mono">[mock]</span> Joined room <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.`;
+        return;
+      }
+
+      // Require a join URL
+      if(!cfg.joinUrl){
+        errorBar("Set your official Join URL first (in the Config card) and Save.");
+        setStatus("err","No Join URL configured");
+        return;
+      }
+
+      // Build request
+      const method = (cfg.method||"POST").toUpperCase();
+      let headers = {};
+      try{ headers = cfg.headers || {}; }catch{ headers = {}; }
+
+      // Template body with extras you might care about
+      let bodyTpl;
+      try{ bodyTpl = cfg.bodyTemplate || {"code":"${code}","name":"${name}"}; }catch{ bodyTpl={"code":"${code}","name":"${name}"} }
+      const bodyObj = tpl(bodyTpl, {code, name, incognito, bypassFilter, firstPlaceSwitch});
+      const fetchOpts = {
+        method,
+        headers,
+        mode: "cors",          // if the official endpoint supports CORS
+        credentials: "omit"    // keep auth out unless endpoint docs say otherwise
+      };
+      if(method !== "GET"){ fetchOpts.body = JSON.stringify(bodyObj); }
 
       try{
-        if(mock){
-          // Simulate latency + success payload
-          setStatus("warn","Mock Mode is ON (simulated join)");
-          await new Promise(r=>setTimeout(r,600));
-          elOut.innerHTML = `<span class="small">[mock]</span> Joined room <b>${roomCode}</b> as <b>${name}</b>.`;
-          showToast("Mock joined.");
-          return;
+        setStatus("ok","Joining...");
+        const res = await fetch(cfg.joinUrl, fetchOpts);
+        const text = await res.text();
+        let data; try{ data = JSON.parse(text); }catch{ data = {raw:text}; }
+
+        if(!res.ok){
+          const msg = (data && (data.error || data.message)) || ("HTTP "+res.status);
+          throw new Error(msg);
         }
 
-        setStatus("ok","Joining...");
-        const data = await joinRoomAPI({roomCode, name});
-        // Adjust below according to your API's success payload.
-        elOut.innerHTML = `Joined <b>${roomCode}</b> as <b>${name}</b>.<br/><span class="small">Response:</span> <span class="mono">${escapeHtml(JSON.stringify(data))}</span>`;
-        showToast("Joined!");
+        out.innerHTML = `Joined <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.<br><span class="mono">${escapeHtml(JSON.stringify(data))}</span>`;
         setStatus("ok","Joined successfully.");
       }catch(err){
         console.error(err);
-        const msg = err && err.message ? err.message : "Join failed";
-        elOut.innerHTML = `<span class="error">Join failed:</span> <span class="mono">${escapeHtml(msg)}</span>`;
         setStatus("err","Join failed.");
-        showToast("Join failed.");
+        // Make the common cause explicit:
+        if(String(err).includes("TypeError: Failed to fetch")){
+          out.innerHTML = `<span class="error">Join failed:</span> <span class="mono">Network/CORS error (“Failed to fetch”). Check Join URL & CORS.</span>`;
+        }else{
+          out.innerHTML = `<span class="error">Join failed:</span> <span class="mono">${escapeHtml(err.message||"request failed")}</span>`;
+        }
+        errorBar("Join failed");
       }
+    }
+
+    // helper
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    /* ----------------- WIRING / UX ----------------- */
+    function wireSwitch(wrapId, inputId){
+      const wrap = document.getElementById(wrapId);
+      const input = document.getElementById(inputId);
+      const sync = ()=>wrap.setAttribute("aria-checked", String(input.checked));
+      wrap.addEventListener("click", ()=>{ input.checked = !input.checked; sync(); });
+      wrap.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); input.checked=!input.checked; sync(); }});
+      sync();
+    }
+    wireSwitch("sw-incog-wrap","icogmode");
+    wireSwitch("sw-bcf-wrap","bcf");
+    wireSwitch("sw-fps-wrap","fpswitch");
+    wireSwitch("sw-mock-wrap","mockmode");
+
+    // Clear / Test / Save / Reset
+    document.getElementById("btn-clear").addEventListener("click", ()=>{
+      document.getElementById("gcode").value="";
+      document.getElementById("gname").value="";
     });
 
-    $("#btn-clear").addEventListener("click", ()=>{
-      elRoom.value=""; elName.value="";
-      showToast("Cleared.");
-    });
-
-    /* ===================== CONFIG ACTIONS ===================== */
-    $("#btn-save").addEventListener("click", ()=>{
+    document.getElementById("btn-save").addEventListener("click", ()=>{
       try{
-        const next = {
-          baseUrl: elCfgUrl.value.trim(),
-          joinPath: elCfgPath.value.trim(),
-          method: elCfgMethod.value.trim().toUpperCase() || "POST",
-          publicKey: elCfgKey.value.trim(),
-          bodyTemplate: JSON.parse(elCfgBody.value || "{}"),
-          headers: JSON.parse(elCfgHdrs.value || "{}"),
+        const cfg = {
+          joinUrl: document.getElementById("cfg-url").value.trim(),
+          method: document.getElementById("cfg-method").value.trim().toUpperCase() || "POST",
+          headers: JSON.parse(document.getElementById("cfg-hdrs").value || "{}"),
+          bodyTemplate: JSON.parse(document.getElementById("cfg-body").value || '{"code":"${code}","name":"${name}"}')
         };
-        saveConfig(next);
-        elCfgOut.textContent = "Saved.";
-        showToast("Config saved.");
+        saveCfg(cfg);
+        document.getElementById("cfg-out").textContent = "Saved.";
+        syncStatus();
       }catch(e){
-        elCfgOut.textContent = "Invalid JSON in body/headers.";
+        document.getElementById("cfg-out").textContent = "Invalid JSON in headers/body.";
       }
     });
 
-    $("#btn-reset").addEventListener("click", ()=>{
-      saveConfig(DEFAULT_CONFIG);
-      elCfgUrl.value = DEFAULT_CONFIG.baseUrl;
-      elCfgPath.value = DEFAULT_CONFIG.joinPath;
-      elCfgMethod.value = DEFAULT_CONFIG.method;
-      elCfgKey.value = DEFAULT_CONFIG.publicKey || "";
-      elCfgBody.value = JSON.stringify(DEFAULT_CONFIG.bodyTemplate);
-      elCfgHdrs.value = JSON.stringify(DEFAULT_CONFIG.headers);
-      elCfgOut.textContent = "Reset to defaults.";
-      showToast("Config reset.");
+    document.getElementById("btn-reset").addEventListener("click", ()=>{
+      localStorage.removeItem("roomjoin:cfg");
+      document.getElementById("cfg-url").value="";
+      document.getElementById("cfg-method").value="POST";
+      document.getElementById("cfg-hdrs").value='{"Content-Type":"application/json"}';
+      document.getElementById("cfg-body").value='{"code":"${code}","name":"${name}"}';
+      document.getElementById("cfg-out").textContent = "Reset.";
+      syncStatus();
     });
 
-    $("#btn-test").addEventListener("click", async ()=>{
-      const roomCode = elRoom.value.trim() || "000000";
-      const name = elName.value.trim() || "Tester";
-      if($("#sw-mock").checked){
-        elCfgOut.textContent = "Mock Mode is ON — toggle it off to test.";
+    document.getElementById("btn-test").addEventListener("click", async ()=>{
+      const cfg = getCfg();
+      const out = document.getElementById("cfg-out");
+      if(document.getElementById("mockmode").checked){
+        out.textContent = "Mock Mode is ON — toggle it off to test the network.";
         return;
       }
+      if(!cfg.joinUrl){ out.textContent = "Set Join URL first."; return; }
+
       try{
-        setStatus("ok","Testing connectivity...");
-        const result = await joinRoomAPI({roomCode, name});
-        elCfgOut.innerHTML = `OK. Response: <span class="mono">${escapeHtml(JSON.stringify(result))}</span>`;
-        setStatus("ok","Connectivity OK.");
-        showToast("API OK");
+        const probe = await fetch(cfg.joinUrl, {method: (cfg.method||"POST").toUpperCase(), headers: cfg.headers||{}, mode:"cors", credentials:"omit"});
+        out.textContent = probe.ok ? "Connectivity OK (HTTP "+probe.status+")." : "Got HTTP "+probe.status+" — the endpoint responded.";
       }catch(e){
-        elCfgOut.innerHTML = `<span class="error">Error:</span> <span class="mono">${escapeHtml(e.message||"request failed")}</span>`;
-        setStatus("err","Connectivity error.");
-        showToast("Test failed");
+        out.textContent = "Failed to fetch — this is usually CORS or a bad URL.";
       }
     });
 
-    /* ===================== UTILS ===================== */
-    function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function syncStatus(){
+      const cfg = getCfg();
+      const dot = document.getElementById("status-dot");
+      const st  = document.getElementById("status-text");
+      const mock = document.getElementById("mockmode").checked;
+
+      if(mock){
+        dot.className="dot warn"; st.textContent="Mock Mode: no network calls.";
+      }else if(cfg.joinUrl){
+        dot.className="dot ok"; st.textContent="Ready. Using configured Join URL.";
+      }else{
+        dot.className="dot warn"; st.textContent="Set your official Join URL in the Config card.";
+      }
+    }
+
+    // Prefill from URL param ?code=123456 like your old file
+    (function prefillFromQuery(){
+      const urlcode = new URLSearchParams(location.search).get("code");
+      if(urlcode){ document.getElementById("gcode").value = urlcode; }
+      // restore last name/code if present
+      try{
+        const last = JSON.parse(localStorage.getItem("roomjoin:last")||"null");
+        if(last){
+          if(!urlcode) document.getElementById("gcode").value = last.code || "";
+          document.getElementById("gname").value = last.name || "";
+        }
+      }catch{}
+    })();
   </script>
 </body>
 </html>
