@@ -3,9 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Room Join (Clean Frontend)</title>
+  <title>Authorized Room Join</title>
   <meta property="og:type" content="website" />
-  <meta name="description" content="Clean, ad-free front-end for joining authorized Blooket rooms." />
+  <meta name="description" content="Ad-free, front-end only room join tool." />
+
+  <!-- Optional: set these to hard-wire config without query params -->
+  <!-- <meta name="x-join-url" content="https://your-domain.example/join"> -->
+  <!-- <meta name="x-join-method" content="POST"> -->
+  <!-- <meta name="x-join-headers" content='{"Content-Type":"application/json"}'> -->
+  <!-- <meta name="x-join-body" content='{"code":"${code}","name":"${name}"}'> -->
 
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
 
@@ -25,61 +31,41 @@
       color:var(--text);
       -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
     }
-
     .wrap{max-width:880px;margin:0 auto;padding:28px 16px}
     header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
     .logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
       background:linear-gradient(135deg,var(--brand),var(--brand2));font-weight:900;box-shadow:0 10px 26px rgba(91,140,255,.35)}
     .title{font-weight:900;font-size:20px}
     .sub{font-size:12px;color:var(--muted);margin-top:2px}
-
-    .card{
-      background:linear-gradient(180deg,var(--panel),var(--panel2));
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:16px;overflow:hidden;margin-top:14px;
-      box-shadow:0 18px 48px rgba(2,12,33,.6), inset 0 1px 0 rgba(255,255,255,.04);
-    }
+    .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;overflow:hidden;margin-top:14px;box-shadow:0 18px 48px rgba(2,12,33,.6), inset 0 1px 0 rgba(255,255,255,.04)}
     .head{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:900}
     .body{padding:16px;display:grid;gap:14px}
-
     .grid{display:grid;gap:12px}
     .g2{grid-template-columns:1fr}
     @media(min-width:720px){.g2{grid-template-columns:1fr 1fr}}
-
     label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-    .input input{
-      width:100%;padding:12px 14px;background:rgba(255,255,255,.05);
+    .input input{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.09);color:var(--text);border-radius:12px;outline:none;font-weight:800;
-      transition:.2s border,.2s box-shadow,.2s background;
-    }
+      transition:.2s border,.2s box-shadow,.2s background}
     .input input:focus{border-color:rgba(123,168,255,.6);box-shadow:0 0 0 4px var(--ring);background:rgba(255,255,255,.07)}
-
     .switch{display:flex;align-items:center;gap:10px}
     .switch input{display:none}
     .track{width:52px;height:28px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);position:relative}
     .thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.25s transform;box-shadow:0 6px 16px rgba(0,0,0,.25)}
     .switch input:checked + .track{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent}
     .switch input:checked + .track .thumb{transform:translateX(24px)}
-
     .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;transition:transform .06s,opacity .2s,box-shadow .2s}
     .btn:active{transform:translateY(1px) scale(.995)}
     .btn--ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:var(--text)}
     .btn--primary{background:linear-gradient(135deg,#bcd0ff,#8fb0ff 60%,#6f97ff);color:#0b1220;box-shadow:0 14px 28px rgba(91,140,255,.35)}
-
     .status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
-    .dot{width:8px;height:8px;border-radius:50%}
-    .ok{background:var(--ok)} .warn{background:var(--warn)} .err{background:var(--err)}
+    .dot{width:8px;height:8px;border-radius:50%}.ok{background:var(--ok)}.warn{background:var(--warn)}.err{background:var(--err)}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
     .error{color:#ffadad}
-    .hint{font-size:13px;color:var(--muted)}
-
-    .errorBar{
-      position:fixed;left:0;right:0;bottom:-70px;z-index:50;
-      color:#fff;background-color:#e84135;min-height:55px;padding:12px 16px;
-      display:flex;align-items:center;justify-content:center;font-weight:800;
-      transition:.2s transform;transform:translateY(0)
-    }
+    .errorBar{position:fixed;left:0;right:0;bottom:-70px;z-index:50;color:#fff;background-color:#e84135;min-height:55px;padding:12px 16px;
+      display:flex;align-items:center;justify-content:center;font-weight:800;transition:.2s transform;transform:translateY(0)}
     .errorBar.show{transform:translateY(-70px)}
   </style>
 </head>
@@ -89,7 +75,7 @@
       <div class="logo">★</div>
       <div>
         <div class="title">Authorized Room Join</div>
-        <div class="sub">Ad-free • No social links • Front-end only</div>
+        <div class="sub">Ad-free • No socials • Front-end only</div>
       </div>
     </header>
 
@@ -97,7 +83,6 @@
     <section class="card">
       <div class="head">Join a Room</div>
       <div class="body">
-        <!-- keeps old IDs for compatibility -->
         <div class="grid g2">
           <div>
             <label for="gcode">Enter code</label>
@@ -114,7 +99,6 @@
         </div>
 
         <div class="grid">
-          <!-- Keep your old toggles/IDs so existing logic still works -->
           <div class="switch" id="sw-incog-wrap" role="switch" aria-checked="true" tabindex="0">
             <input type="checkbox" id="icogmode" checked />
             <span class="track"><span class="thumb"></span></span>
@@ -134,7 +118,7 @@
 
         <div class="status">
           <span class="dot warn" id="status-dot"></span>
-          <span id="status-text">Configure your official endpoint below, or paste it into the URL box and Save.</span>
+          <span id="status-text">Auto-configuring…</span>
         </div>
 
         <div class="actions">
@@ -150,35 +134,35 @@
     <section class="card">
       <div class="head">API Configuration</div>
       <div class="body">
-        <p class="hint">Set your officially supported, **browser-safe** endpoint. If it needs a secret, don’t put it here.</p>
+        <p class="mono" style="font-size:12px;color:#9fb0cf;margin:0">
+          Auto-filled from query/meta/defaults. You can still edit &amp; Save.
+        </p>
         <div class="grid g2">
           <div>
             <label for="cfg-url">Join URL (full)</label>
-            <div class="input"><input id="cfg-url" placeholder="https://official.api.example/join" /></div>
+            <div class="input"><input id="cfg-url" /></div>
           </div>
           <div>
             <label for="cfg-method">HTTP Method</label>
-            <div class="input"><input id="cfg-method" value="POST" /></div>
+            <div class="input"><input id="cfg-method" /></div>
           </div>
         </div>
         <div class="grid g2">
           <div>
             <label for="cfg-hdrs">Headers (JSON)</label>
-            <div class="input"><input id="cfg-hdrs" class="mono" value='{"Content-Type":"application/json"}' /></div>
+            <div class="input"><input id="cfg-hdrs" class="mono" /></div>
           </div>
           <div>
             <label for="cfg-body">Body Template (JSON)</label>
-            <div class="input"><input id="cfg-body" class="mono" value='{"code":"${code}","name":"${name}"}' /></div>
+            <div class="input"><input id="cfg-body" class="mono" /></div>
           </div>
         </div>
-        <div class="grid">
-          <div class="switch" id="sw-mock-wrap" role="switch" aria-checked="false" tabindex="0">
-            <input type="checkbox" id="mockmode" />
-            <span class="track"><span class="thumb"></span></span>
-            <span>Mock Mode (use fake success without network)</span>
-          </div>
+        <div class="switch" id="sw-mock-wrap" role="switch" aria-checked="false" tabindex="0" style="margin-top:8px">
+          <input type="checkbox" id="mockmode" />
+          <span class="track"><span class="thumb"></span></span>
+          <span>Mock Mode (fake success, no network)</span>
         </div>
-        <div class="actions">
+        <div class="actions" style="margin-top:6px">
           <button class="btn btn--ghost" id="btn-save">Save</button>
           <button class="btn btn--ghost" id="btn-reset">Reset</button>
           <button class="btn btn--primary" id="btn-test">Test</button>
@@ -191,43 +175,84 @@
   <div class="errorBar" id="error"></div>
 
   <script>
-    /* ----------------- CONFIG ----------------- */
-    const CONFIG = {
-      joinUrl: "",                                  // <— put your official FULL join endpoint here (or save in UI)
-      method: "POST",
+    /* ----------------- DEFAULTS & AUTOFILL ----------------- */
+    const DEFAULTS = {
+      joinUrlCandidates: [
+        // highest confidence first; change or add your own
+        new URL('/api/join', location.href).href,
+        new URL('/join', location.href).href,
+        new URL('/v1/join', location.href).href
+      ],
+      method: 'POST',
       headers: {"Content-Type":"application/json"},
       bodyTemplate: {"code":"${code}","name":"${name}"}
     };
 
-    // Load saved config (if any)
-    (function initConfigUI(){
-      const saved = loadCfg();
-      const cfg = saved || CONFIG;
+    // Allow overrides via query params:
+    // ?joinUrl=https://...&method=POST&headers=%7B...%7D&body=%7B...%7D
+    function fromQuery(){
+      const q = new URLSearchParams(location.search);
+      return {
+        joinUrl: q.get('joinUrl') || '',
+        method:  q.get('method')  || '',
+        headers: safeJson(q.get('headers')),
+        bodyTemplate: safeJson(q.get('body'))
+      };
+    }
 
-      // Prefill UI
-      document.getElementById("cfg-url").value    = cfg.joinUrl || "";
-      document.getElementById("cfg-method").value = cfg.method || "POST";
-      document.getElementById("cfg-hdrs").value   = JSON.stringify(cfg.headers||{"Content-Type":"application/json"});
-      document.getElementById("cfg-body").value   = JSON.stringify(cfg.bodyTemplate||{"code":"${code}","name":"${name}"});
+    // Allow overrides via meta tags <meta name="x-join-url" ...> etc.
+    function fromMeta(){
+      const pick = n => (document.querySelector(`meta[name="${n}"]`)||{}).content || '';
+      return {
+        joinUrl: pick('x-join-url'),
+        method:  pick('x-join-method'),
+        headers: safeJson(pick('x-join-headers')),
+        bodyTemplate: safeJson(pick('x-join-body'))
+      };
+    }
 
-      // reflect mock
-      syncStatus();
-    })();
+    function safeJson(s){
+      if(!s) return null;
+      try{ return JSON.parse(s); }catch{ return null; }
+    }
 
     function loadCfg(){
-      try{ return JSON.parse(localStorage.getItem("roomjoin:cfg") || "null"); }catch{return null}
+      try{ return JSON.parse(localStorage.getItem('roomjoin:cfg')||'null'); }catch{ return null; }
     }
     function saveCfg(cfg){
-      localStorage.setItem("roomjoin:cfg", JSON.stringify(cfg));
-    }
-    function getCfg(){
-      return loadCfg() || CONFIG;
-    }
-    function tpl(json, vars){
-      return JSON.parse(JSON.stringify(json).replace(/\$\{(\w+)\}/g,(m,k)=>vars[k] ?? ""));
+      localStorage.setItem('roomjoin:cfg', JSON.stringify(cfg));
     }
 
-    /* ----------------- OLD-ID COMPAT FUNCTIONS ----------------- */
+    function mergeAutoConfig(){
+      // Priority: saved > query > meta > defaults
+      const saved = loadCfg() || {};
+      const q = fromQuery();
+      const m = fromMeta();
+
+      let joinUrl = saved.joinUrl || q.joinUrl || m.joinUrl || '';
+      let method  = saved.method  || q.method  || m.method  || DEFAULTS.method;
+      let headers = saved.headers || q.headers || m.headers || DEFAULTS.headers;
+      let bodyTemplate = saved.bodyTemplate || q.bodyTemplate || m.bodyTemplate || DEFAULTS.bodyTemplate;
+
+      // If no joinUrl anywhere, pick first candidate and set it — this is the “automatic fill”
+      if(!joinUrl){
+        joinUrl = DEFAULTS.joinUrlCandidates[0];
+      }
+
+      const cfg = { joinUrl, method: (method||'POST').toUpperCase(), headers, bodyTemplate };
+      saveCfg(cfg);
+      return cfg;
+    }
+
+    function writeCfgToUI(cfg){
+      document.getElementById('cfg-url').value    = cfg.joinUrl || '';
+      document.getElementById('cfg-method').value = cfg.method  || 'POST';
+      document.getElementById('cfg-hdrs').value   = JSON.stringify(cfg.headers||{"Content-Type":"application/json"});
+      document.getElementById('cfg-body').value   = JSON.stringify(cfg.bodyTemplate||{"code":"${code}","name":"${name}"});
+    }
+
+    /* ----------------- UTIL ----------------- */
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
     function errorBar(msg){
       const e=document.getElementById("error");
       e.textContent=msg;
@@ -235,104 +260,48 @@
       clearTimeout(errorBar._t);
       errorBar._t=setTimeout(()=>e.classList.remove("show"), 3500);
     }
-
-    // preserve your old `join()` entry point
-    function join(){
-      const cin  = document.getElementById("gcode");
-      const name = document.getElementById("gname");
-      const incog = document.getElementById("icogmode").checked;
-      const bcf   = document.getElementById("bcf").checked;
-      const fps   = document.getElementById("fpswitch").checked;
-
-      joinGame(cin.value.trim(), name.value.trim(), incog, bcf, fps);
+    function tpl(json, vars){
+      return JSON.parse(JSON.stringify(json).replace(/\$\{(\w+)\}/g,(m,k)=>vars[k] ?? ""));
     }
-
-    // NEW: in-file joinGame that calls your official endpoint
-    async function joinGame(code, name, incognito=true, bypassFilter=false, firstPlaceSwitch=true){
-      const out = document.getElementById("out");
-      out.textContent = "";
-
-      if(!code){ errorBar("Enter a code."); return; }
-      if(!name){ errorBar("Enter a nickname."); return; }
-
-      // Friendly name guard like before
-      if(!/^[a-z0-9 _-]+$/i.test(name)){
-        errorBar("Nickname must be letters/numbers/spaces/-/_ only.");
-        return;
-      }
-
-      const cfg = getCfg();
-      const mock = document.getElementById("mockmode").checked;
-
-      // Set status UI
+    function setStatus(kind, text){
       const dot = document.getElementById("status-dot");
       const st  = document.getElementById("status-text");
-      function setStatus(kind, text){ dot.className = "dot " + kind; st.textContent = text; }
-
-      // Save last used
-      try{ localStorage.setItem("roomjoin:last", JSON.stringify({code,name})); }catch{}
-
-      if(mock){
-        setStatus("warn","Mock Mode: simulating success (no network)");
-        await new Promise(r=>setTimeout(r,600));
-        out.innerHTML = `<span class="mono">[mock]</span> Joined room <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.`;
-        return;
-      }
-
-      // Require a join URL
-      if(!cfg.joinUrl){
-        errorBar("Set your official Join URL first (in the Config card) and Save.");
-        setStatus("err","No Join URL configured");
-        return;
-      }
-
-      // Build request
-      const method = (cfg.method||"POST").toUpperCase();
-      let headers = {};
-      try{ headers = cfg.headers || {}; }catch{ headers = {}; }
-
-      // Template body with extras you might care about
-      let bodyTpl;
-      try{ bodyTpl = cfg.bodyTemplate || {"code":"${code}","name":"${name}"}; }catch{ bodyTpl={"code":"${code}","name":"${name}"} }
-      const bodyObj = tpl(bodyTpl, {code, name, incognito, bypassFilter, firstPlaceSwitch});
-      const fetchOpts = {
-        method,
-        headers,
-        mode: "cors",          // if the official endpoint supports CORS
-        credentials: "omit"    // keep auth out unless endpoint docs say otherwise
-      };
-      if(method !== "GET"){ fetchOpts.body = JSON.stringify(bodyObj); }
-
-      try{
-        setStatus("ok","Joining...");
-        const res = await fetch(cfg.joinUrl, fetchOpts);
-        const text = await res.text();
-        let data; try{ data = JSON.parse(text); }catch{ data = {raw:text}; }
-
-        if(!res.ok){
-          const msg = (data && (data.error || data.message)) || ("HTTP "+res.status);
-          throw new Error(msg);
-        }
-
-        out.innerHTML = `Joined <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.<br><span class="mono">${escapeHtml(JSON.stringify(data))}</span>`;
-        setStatus("ok","Joined successfully.");
-      }catch(err){
-        console.error(err);
-        setStatus("err","Join failed.");
-        // Make the common cause explicit:
-        if(String(err).includes("TypeError: Failed to fetch")){
-          out.innerHTML = `<span class="error">Join failed:</span> <span class="mono">Network/CORS error (“Failed to fetch”). Check Join URL & CORS.</span>`;
-        }else{
-          out.innerHTML = `<span class="error">Join failed:</span> <span class="mono">${escapeHtml(err.message||"request failed")}</span>`;
-        }
-        errorBar("Join failed");
-      }
+      dot.className = "dot " + kind;
+      st.textContent = text;
     }
 
-    // helper
-    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    /* ----------------- BOOT: AUTOFILL & PREFILL ----------------- */
+    const CONFIG = mergeAutoConfig();
+    writeCfgToUI(CONFIG);
+    setStatus(CONFIG.joinUrl ? 'ok' : 'warn', CONFIG.joinUrl ? 'Auto-filled API config.' : 'Waiting for API config…');
 
-    /* ----------------- WIRING / UX ----------------- */
+    // Optional: quick connectivity probe (non-blocking)
+    (async () => {
+      if(!CONFIG.joinUrl) return;
+      try{
+        const probe = await fetch(CONFIG.joinUrl, {method: (CONFIG.method||'POST').toUpperCase(), headers: CONFIG.headers||{}, mode:'cors', credentials:'omit'});
+        if(probe.ok){ setStatus('ok','Auto-filled & endpoint reachable.'); }
+        else{ setStatus('warn','Auto-filled; endpoint responded HTTP '+probe.status+'.'); }
+      }catch{
+        // still auto-filled; likely CORS or offline
+        setStatus('warn','Auto-filled; network/CORS not confirmed.');
+      }
+    })();
+
+    // Prefill join form from URL (?code=...) and last used
+    (function prefillJoin(){
+      const urlcode = new URLSearchParams(location.search).get("code");
+      if(urlcode){ document.getElementById("gcode").value = urlcode; }
+      try{
+        const last = JSON.parse(localStorage.getItem("roomjoin:last")||"null");
+        if(last){
+          if(!urlcode) document.getElementById("gcode").value = last.code || "";
+          document.getElementById("gname").value = last.name || "";
+        }
+      }catch{}
+    })();
+
+    /* ----------------- SWITCHES & BUTTONS ----------------- */
     function wireSwitch(wrapId, inputId){
       const wrap = document.getElementById(wrapId);
       const input = document.getElementById(inputId);
@@ -346,12 +315,10 @@
     wireSwitch("sw-fps-wrap","fpswitch");
     wireSwitch("sw-mock-wrap","mockmode");
 
-    // Clear / Test / Save / Reset
     document.getElementById("btn-clear").addEventListener("click", ()=>{
       document.getElementById("gcode").value="";
       document.getElementById("gname").value="";
     });
-
     document.getElementById("btn-save").addEventListener("click", ()=>{
       try{
         const cfg = {
@@ -361,68 +328,86 @@
           bodyTemplate: JSON.parse(document.getElementById("cfg-body").value || '{"code":"${code}","name":"${name}"}')
         };
         saveCfg(cfg);
+        setStatus(cfg.joinUrl ? 'ok' : 'warn', cfg.joinUrl ? 'Config saved.' : 'Config saved (no URL).');
         document.getElementById("cfg-out").textContent = "Saved.";
-        syncStatus();
-      }catch(e){
+      }catch{
         document.getElementById("cfg-out").textContent = "Invalid JSON in headers/body.";
       }
     });
-
     document.getElementById("btn-reset").addEventListener("click", ()=>{
       localStorage.removeItem("roomjoin:cfg");
-      document.getElementById("cfg-url").value="";
-      document.getElementById("cfg-method").value="POST";
-      document.getElementById("cfg-hdrs").value='{"Content-Type":"application/json"}';
-      document.getElementById("cfg-body").value='{"code":"${code}","name":"${name}"}';
+      const cfg = mergeAutoConfig();
+      writeCfgToUI(cfg);
+      setStatus(cfg.joinUrl ? 'ok' : 'warn', cfg.joinUrl ? 'Auto-filled after reset.' : 'Reset; no URL found.');
       document.getElementById("cfg-out").textContent = "Reset.";
-      syncStatus();
     });
-
     document.getElementById("btn-test").addEventListener("click", async ()=>{
-      const cfg = getCfg();
-      const out = document.getElementById("cfg-out");
-      if(document.getElementById("mockmode").checked){
-        out.textContent = "Mock Mode is ON — toggle it off to test the network.";
-        return;
-      }
-      if(!cfg.joinUrl){ out.textContent = "Set Join URL first."; return; }
-
+      const mock = document.getElementById("mockmode").checked;
+      if(mock){ document.getElementById("cfg-out").textContent = "Mock Mode is ON — turn it off to test network."; return; }
+      const cfg = loadCfg() || CONFIG;
+      if(!cfg.joinUrl){ document.getElementById("cfg-out").textContent = "No Join URL set."; return; }
       try{
-        const probe = await fetch(cfg.joinUrl, {method: (cfg.method||"POST").toUpperCase(), headers: cfg.headers||{}, mode:"cors", credentials:"omit"});
-        out.textContent = probe.ok ? "Connectivity OK (HTTP "+probe.status+")." : "Got HTTP "+probe.status+" — the endpoint responded.";
-      }catch(e){
-        out.textContent = "Failed to fetch — this is usually CORS or a bad URL.";
+        const res = await fetch(cfg.joinUrl, {method: (cfg.method||'POST').toUpperCase(), headers: cfg.headers||{}, mode:'cors', credentials:'omit'});
+        document.getElementById("cfg-out").textContent = res.ok ? "Connectivity OK (HTTP "+res.status+")." : "Got HTTP "+res.status+".";
+      }catch{
+        document.getElementById("cfg-out").textContent = "Failed to fetch — likely CORS or incorrect URL.";
       }
     });
 
-    function syncStatus(){
-      const cfg = getCfg();
-      const dot = document.getElementById("status-dot");
-      const st  = document.getElementById("status-text");
+    /* ----------------- JOIN FLOW (front-end only) ----------------- */
+    function join(){
+      const cin  = document.getElementById("gcode");
+      const name = document.getElementById("gname");
+      const incog = document.getElementById("icogmode").checked;
+      const bcf   = document.getElementById("bcf").checked;
+      const fps   = document.getElementById("fpswitch").checked;
+      joinGame(cin.value.trim(), name.value.trim(), incog, bcf, fps);
+    }
+
+    async function joinGame(code, name, incognito=true, bypassFilter=false, firstPlaceSwitch=true){
+      const out = document.getElementById("out");
+      out.textContent = "";
+      if(!code){ errorBar("Enter a code."); return; }
+      if(!name){ errorBar("Enter a nickname."); return; }
+      if(!/^[a-z0-9 _-]+$/i.test(name)){ errorBar("Nickname must be letters/numbers/spaces/-/_ only."); return; }
+
+      try{ localStorage.setItem("roomjoin:last", JSON.stringify({code,name})); }catch{}
+
+      const cfg = loadCfg() || CONFIG;
       const mock = document.getElementById("mockmode").checked;
 
       if(mock){
-        dot.className="dot warn"; st.textContent="Mock Mode: no network calls.";
-      }else if(cfg.joinUrl){
-        dot.className="dot ok"; st.textContent="Ready. Using configured Join URL.";
-      }else{
-        dot.className="dot warn"; st.textContent="Set your official Join URL in the Config card.";
+        setStatus('warn','Mock Mode: simulating success.');
+        await new Promise(r=>setTimeout(r,400));
+        out.innerHTML = `<span class="mono">[mock]</span> Joined room <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.`;
+        return;
+      }
+
+      if(!cfg.joinUrl){ errorBar("No Join URL configured."); setStatus('err','No Join URL.'); return; }
+
+      const method = (cfg.method||"POST").toUpperCase();
+      const bodyObj = tpl(cfg.bodyTemplate||{"code":"${code}","name":"${name}"},{code,name,incognito,bypassFilter,firstPlaceSwitch});
+      const opts = { method, headers: cfg.headers||{}, mode:'cors', credentials:'omit' };
+      if(method !== 'GET'){ opts.body = JSON.stringify(bodyObj); }
+
+      try{
+        setStatus('ok','Joining…');
+        const res = await fetch(cfg.joinUrl, opts);
+        const text = await res.text();
+        let data; try{ data = JSON.parse(text); }catch{ data = {raw:text}; }
+        if(!res.ok){ throw new Error((data && (data.error||data.message)) || ('HTTP '+res.status)); }
+        out.innerHTML = `Joined <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.<br><span class="mono">${escapeHtml(JSON.stringify(data))}</span>`;
+        setStatus('ok','Joined successfully.');
+      }catch(err){
+        if(String(err).includes("TypeError: Failed to fetch")){
+          out.innerHTML = `<span class="error">Join failed:</span> <span class="mono">Network/CORS error (“Failed to fetch”).</span>`;
+        }else{
+          out.innerHTML = `<span class="error">Join failed:</span> <span class="mono">${escapeHtml(err.message||"request failed")}</span>`;
+        }
+        errorBar("Join failed");
+        setStatus('err','Join failed.');
       }
     }
-
-    // Prefill from URL param ?code=123456 like your old file
-    (function prefillFromQuery(){
-      const urlcode = new URLSearchParams(location.search).get("code");
-      if(urlcode){ document.getElementById("gcode").value = urlcode; }
-      // restore last name/code if present
-      try{
-        const last = JSON.parse(localStorage.getItem("roomjoin:last")||"null");
-        if(last){
-          if(!urlcode) document.getElementById("gcode").value = last.code || "";
-          document.getElementById("gname").value = last.name || "";
-        }
-      }catch{}
-    })();
   </script>
 </body>
 </html>
