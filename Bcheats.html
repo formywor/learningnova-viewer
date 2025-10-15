@@ -1,346 +1,395 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Demo Lobby (Front-End Only)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
-    <style>
-      :root {
-        --bg: #0b1220;
-        --panel: #111a2b;
-        --panel-2: #0e1726;
-        --text: #e8eefc;
-        --muted: #a8b3cf;
-        --brand: #5b8cff;
-        --brand-2: #7aa2ff;
-        --ok: #17c964;
-        --warn: #f5a524;
-        --err: #f31260;
-        --ring: rgba(123, 168, 255, 0.5);
-      }
-
-      * { box-sizing: border-box; }
-      html, body { height: 100%; }
-      body {
-        margin: 0;
-        font-family: Nunito, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-        background:
-          radial-gradient(1200px 1200px at 120% -20%, #223458 0%, transparent 60%),
-          radial-gradient(900px 800px at -10% 120%, #162443 0%, transparent 60%),
-          linear-gradient(180deg, var(--bg), #0a1120 60%, #090f1d);
-        color: var(--text);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-
-      .shell {
-        min-height: 100%;
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-      }
-
-      header {
-        padding: 20px 16px;
-      }
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        user-select: none;
-      }
-      .logo {
-        width: 36px; height: 36px; border-radius: 10px;
-        display: grid; place-items: center; color: white;
-        background: linear-gradient(135deg, var(--brand), var(--brand-2));
-        box-shadow: 0 10px 30px rgba(91,140,255,0.35), inset 0 0 20px rgba(255,255,255,0.05);
-      }
-      .brand h1 {
-        font-size: 18px; margin: 0; letter-spacing: 0.4px; font-weight: 800;
-      }
-
-      main {
-        display: grid;
-        place-items: center;
-        padding: 24px 16px 48px;
-      }
-
-      .card {
-        width: 100%;
-        max-width: 720px;
-        background:
-          radial-gradient(120% 180% at 100% 0%, rgba(91,140,255,0.08), transparent 60%),
-          linear-gradient(180deg, var(--panel), var(--panel-2));
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 18px;
-        box-shadow:
-          0 20px 60px rgba(2, 12, 33, 0.6),
-          inset 0 1px 0 rgba(255,255,255,0.05);
-        overflow: hidden;
-      }
-
-      .card__head {
-        padding: 20px 22px;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        display: flex; align-items: center; justify-content: space-between;
-        gap: 12px;
-      }
-      .card__title { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: 0.3px; }
-      .badge {
-        font-size: 12px; padding: 6px 10px; border-radius: 999px;
-        color: white; background: linear-gradient(135deg, #7b5bff, #9a85ff);
-        border: 1px solid rgba(255,255,255,0.12);
-      }
-
-      .card__body { padding: 22px; display: grid; gap: 18px; }
-
-      .row { display: grid; gap: 12px; }
-      @media (min-width: 720px) {
-        .row--2 { grid-template-columns: 1fr 1fr; }
-      }
-
-      label {
-        display: block; font-size: 13px; color: var(--muted); margin: 0 0 6px;
-        letter-spacing: 0.2px;
-      }
-
-      .input {
-        position: relative;
-      }
-      .input input {
-        width: 100%;
-        padding: 14px 14px 14px 44px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 12px; color: var(--text); font-size: 16px; font-weight: 700;
-        outline: none; transition: 0.2s border, 0.2s box-shadow, 0.2s background;
-      }
-      .input input::placeholder { color: #7f8bad; font-weight: 600; }
-      .input input:focus {
-        border-color: rgba(123,168,255,0.6);
-        box-shadow: 0 0 0 4px var(--ring);
-        background: rgba(255,255,255,0.06);
-      }
-      .input .leading {
-        position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-        opacity: 0.8; font-size: 16px;
-      }
-
-      .switch {
-        display: inline-flex; align-items: center; gap: 10px; user-select: none;
-      }
-      .switch input { display: none; }
-      .switch .track {
-        width: 50px; height: 28px; border-radius: 999px; position: relative;
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: 0.2s background, 0.2s border;
-      }
-      .switch .thumb {
-        width: 22px; height: 22px; border-radius: 50%; position: absolute; top: 2px; left: 2px;
-        background: #fff; transition: 0.25s transform, 0.25s box-shadow;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-      }
-      .switch input:checked + .track { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; }
-      .switch input:checked + .track .thumb { transform: translateX(22px); }
-
-      .hint {
-        font-size: 13px; color: var(--muted);
-      }
-
-      .actions {
-        display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: flex-end; margin-top: 6px;
-      }
-      .btn {
-        appearance: none; border: 0; outline: none; cursor: pointer;
-        border-radius: 12px; padding: 12px 16px; font-weight: 800; font-size: 15px;
-        transition: transform .06s ease-in-out, box-shadow .2s, background .2s, opacity .2s;
-      }
-      .btn:active { transform: translateY(1px) scale(0.995); }
-      .btn--ghost {
-        color: var(--text);
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.09);
-      }
-      .btn--primary {
-        color: #0c1220;
-        background: linear-gradient(135deg, #b6cbff, #8fb0ff 60%, #6f97ff);
-        box-shadow: 0 14px 28px rgba(91,140,255,0.35), inset 0 0 20px rgba(255,255,255,0.25);
-      }
-      .btn[disabled] { opacity: .6; cursor: not-allowed; }
-
-      .divider {
-        height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0;
-      }
-
-      .toast {
-        position: fixed; inset-inline: 0; bottom: 20px; display: grid; place-items: center; pointer-events: none;
-      }
-      .toast__inner {
-        pointer-events: auto;
-        padding: 12px 16px; border-radius: 12px;
-        background: #0f1a31; border: 1px solid rgba(255,255,255,0.09);
-        box-shadow: 0 16px 40px rgba(0,0,0,0.45);
-        font-weight: 700; font-size: 14px;
-      }
-
-      footer {
-        padding: 28px 16px 34px;
-        color: var(--muted);
-        font-size: 13px;
-        text-align: center;
-      }
-      .testing {
-        display: inline-block;
-        margin-top: 8px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.09);
-        color: #fff;
-        font-weight: 800;
-        letter-spacing: .3px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="shell">
-      <header>
-        <div class="brand" aria-label="App branding">
-          <div class="logo" aria-hidden="true">★</div>
-          <h1>Demo Lobby</h1>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Room Join (Authorized Front-End)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <meta name="description" content="Clean, ad-free, front-end client for joining rooms using an officially supported method."/>
+  <style>
+    :root{
+      --bg:#0b1220;--panel:#111a2b;--panel2:#0e1726;--text:#e9eefc;--muted:#a8b3cf;
+      --brand:#5b8cff;--brand2:#6f97ff;--ring:rgba(123,168,255,.5);--ok:#17c964;--warn:#f5a524;--err:#e5484d;
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0;font-family:Nunito,system-ui,Segoe UI,Roboto,Helvetica,Arial;
+      background:
+        radial-gradient(1200px 1200px at 120% -20%,#223458 0%,transparent 60%),
+        radial-gradient(900px 800px at -10% 120%,#162443 0%,transparent 60%),
+        linear-gradient(180deg,#0b1220,#090f1d);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    }
+    .shell{min-height:100%;display:grid;grid-template-rows:auto 1fr auto}
+    header{padding:24px 16px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900}
+    .logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 10px 28px rgba(91,140,255,.35)}
+    .subtitle{color:var(--muted);font-weight:700;font-size:12px;margin-top:4px}
+    main{padding:16px;display:grid;gap:16px;max-width:860px;margin:0 auto;width:100%}
+    .card{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid rgba(255,255,255,.06); border-radius:16px; overflow:hidden;
+      box-shadow:0 16px 48px rgba(2,12,33,.6), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .card__head{padding:18px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .card__title{margin:0;font-size:18px;font-weight:900;letter-spacing:.3px}
+    .card__body{padding:18px;display:grid;gap:14px}
+    .row{display:grid;gap:12px}
+    @media(min-width:720px){.row--2{grid-template-columns:1fr 1fr}}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    .input input{
+      width:100%;padding:12px 14px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.09); color:var(--text); border-radius:12px;
+      outline:none; font-weight:800; transition:.2s border,.2s box-shadow,.2s background;
+    }
+    .input input:focus{
+      border-color:rgba(123,168,255,.6); box-shadow:0 0 0 4px var(--ring); background:rgba(255,255,255,.07)
+    }
+    .switch{display:flex;align-items:center;gap:10px}
+    .switch input{display:none}
+    .switch .track{width:52px;height:28px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);position:relative}
+    .switch .thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.25s transform;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    .switch input:checked + .track{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent}
+    .switch input:checked + .track .thumb{transform:translateX(24px)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;transition:transform .06s,opacity .2s,box-shadow .2s}
+    .btn:active{transform:translateY(1px) scale(.995)}
+    .btn--ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:var(--text)}
+    .btn--primary{background:linear-gradient(135deg,#bcd0ff,#8fb0ff 60%,#6f97ff);color:#0b1220;box-shadow:0 14px 28px rgba(91,140,255,.35)}
+    .hint{font-size:13px;color:var(--muted)}
+    footer{padding:24px 16px 34px;text-align:center;color:var(--muted);font-size:13px}
+    .toast{position:fixed;inset-inline:0;bottom:18px;display:grid;place-items:center;pointer-events:none}
+    .toast__inner{pointer-events:auto;background:#0f1a31;border:1px solid rgba(255,255,255,.09);padding:12px 14px;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.45);font-weight:800}
+    .status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .status .dot{width:8px;height:8px;border-radius:50%}
+    .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.err{background:var(--err)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .error{color:#ffadad}
+    .small{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo">★</div>
+        <div>
+          <div>Authorized Room Join</div>
+          <div class="subtitle">Ad-free • No social links • Front-end only</div>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <main>
-        <section class="card" aria-labelledby="card-title">
-          <div class="card__head">
-            <h2 id="card-title" class="card__title">Join a Room</h2>
-            <span class="badge">Front-End Only</span>
+    <main>
+      <section class="card">
+        <div class="card__head"><h2 class="card__title">Join a Room</h2></div>
+        <div class="card__body">
+          <!-- STATUS -->
+          <div class="status" id="status">
+            <span class="dot warn" id="status-dot"></span>
+            <span id="status-text">Mock Mode is ON (no network calls)</span>
           </div>
 
-          <div class="card__body">
-            <div class="row row--2">
-              <div>
-                <label for="room">Room code</label>
-                <div class="input">
-                  <span class="leading" aria-hidden="true">#</span>
-                  <input id="room" name="room" inputmode="numeric" autocomplete="one-time-code"
-                         placeholder="e.g. 123-456" maxlength="12" />
-                </div>
-              </div>
-
-              <div>
-                <label for="name">Display name</label>
-                <div class="input">
-                  <span class="leading" aria-hidden="true">👤</span>
-                  <input id="name" name="name" placeholder="Your name" maxlength="24" />
-                </div>
-              </div>
+          <!-- FORM -->
+          <div class="row row--2">
+            <div>
+              <label for="room">Room code</label>
+              <div class="input"><input id="room" placeholder="e.g. 123-456" maxlength="12" inputmode="numeric" autocomplete="off"/></div>
             </div>
-
-            <div class="row">
-              <div class="switch" role="switch" aria-checked="true" tabindex="0" id="opt-incognito-wrap">
-                <input type="checkbox" id="opt-incognito" checked />
-                <span class="track"><span class="thumb"></span></span>
-                <span>Incognito mode</span>
-              </div>
-              <div class="switch" role="switch" aria-checked="false" tabindex="0" id="opt-filter-wrap">
-                <input type="checkbox" id="opt-filter" />
-                <span class="track"><span class="thumb"></span></span>
-                <span>Friendly names only</span>
-              </div>
-            </div>
-
-            <p class="hint">This is a demo UI. No real game or service is contacted.</p>
-
-            <div class="divider"></div>
-
-            <div class="actions">
-              <button class="btn btn--ghost" type="button" id="btn-clear">Clear</button>
-              <button class="btn btn--primary" type="button" id="btn-join">Join</button>
+            <div>
+              <label for="name">Display name</label>
+              <div class="input"><input id="name" placeholder="Your name" maxlength="24" autocomplete="off"/></div>
             </div>
           </div>
-        </section>
-      </main>
 
-      <footer>
-        <div>No ads. No social links. Pure front-end.</div>
-        <div class="testing" aria-live="polite">testing only</div>
-      </footer>
-    </div>
+          <div class="row">
+            <div class="switch" role="switch" aria-checked="true" tabindex="0" id="sw-friendly-wrap">
+              <input type="checkbox" id="sw-friendly" checked/>
+              <span class="track"><span class="thumb"></span></span>
+              <span>Friendly-name check (A–Z, 0–9, space, - and _)</span>
+            </div>
+            <div class="switch" role="switch" aria-checked="true" tabindex="0" id="sw-remember-wrap">
+              <input type="checkbox" id="sw-remember" checked/>
+              <span class="track"><span class="thumb"></span></span>
+              <span>Remember last used name/code on this device</span>
+            </div>
+            <div class="switch" role="switch" aria-checked="true" tabindex="0" id="sw-mock-wrap">
+              <input type="checkbox" id="sw-mock" checked/>
+              <span class="track"><span class="thumb"></span></span>
+              <span>Mock Mode (disable real API calls)</span>
+            </div>
+          </div>
 
-    <div class="toast" aria-live="polite" aria-atomic="true" id="toast" hidden>
-      <div class="toast__inner" id="toast-content">Joined!</div>
-    </div>
+          <p class="hint">
+            This page calls your official “join room” endpoint when Mock Mode is OFF. Configure the API details below.
+            When Mock Mode is ON, no network calls are made, but you can test the UX.
+          </p>
 
-    <script>
-      // Accessibility helpers for custom switches
-      function wireSwitch(wrapperId, inputId) {
-        const wrap = document.getElementById(wrapperId);
-        const input = document.getElementById(inputId);
-        const sync = () => wrap.setAttribute('aria-checked', String(input.checked));
-        wrap.addEventListener('click', () => { input.checked = !input.checked; sync(); });
-        wrap.addEventListener('keydown', (e) => {
-          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); input.checked = !input.checked; sync(); }
-        });
-        sync();
+          <!-- ACTIONS -->
+          <div class="actions">
+            <button class="btn btn--ghost" id="btn-clear">Clear</button>
+            <button class="btn btn--primary" id="btn-join">Join Room</button>
+          </div>
+
+          <!-- OUTPUT -->
+          <div id="out" class="small mono"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__head"><h2 class="card__title">API Configuration</h2></div>
+        <div class="card__body">
+          <p class="hint">Plug in your officially supported, browser-safe details. If any value requires a secret, don’t put it here—use a server proxy instead.</p>
+          <div class="row row--2">
+            <div>
+              <label for="cfg-url">Base URL</label>
+              <div class="input"><input id="cfg-url" placeholder="https://api.example.com" autocomplete="off"/></div>
+            </div>
+            <div>
+              <label for="cfg-path">Join path</label>
+              <div class="input"><input id="cfg-path" placeholder="/rooms/{roomCode}/join" autocomplete="off"/></div>
+            </div>
+          </div>
+          <div class="row row--2">
+            <div>
+              <label for="cfg-method">HTTP method</label>
+              <div class="input"><input id="cfg-method" placeholder="POST" value="POST" autocomplete="off"/></div>
+            </div>
+            <div>
+              <label for="cfg-key">Client key / token (optional, non-secret)</label>
+              <div class="input"><input id="cfg-key" placeholder="e.g. public_client_token_abc" autocomplete="off"/></div>
+            </div>
+          </div>
+          <div class="row">
+            <label for="cfg-body">Request body template (JSON)</label>
+            <div class="input">
+              <input id="cfg-body" class="mono" autocomplete="off"
+                     value='{"name":"${name}","code":"${roomCode}"}'/>
+            </div>
+          </div>
+          <div class="row">
+            <label for="cfg-hdrs">Extra headers (JSON)</label>
+            <div class="input">
+              <input id="cfg-hdrs" class="mono" autocomplete="off"
+                     value='{"Content-Type":"application/json"}'/>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn--ghost" id="btn-save">Save Config</button>
+            <button class="btn btn--ghost" id="btn-reset">Reset</button>
+            <button class="btn btn--primary" id="btn-test">Test Connectivity</button>
+          </div>
+          <div id="cfg-out" class="small mono"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>Front-end only • No ads • No social links</footer>
+  </div>
+
+  <div class="toast" id="toast" hidden><div class="toast__inner" id="toast-msg">Done</div></div>
+
+  <script>
+    /* ===================== CONFIG ===================== */
+    const DEFAULT_CONFIG = {
+      baseUrl: "https://api.example.com",             // <— put your official base URL
+      joinPath: "/rooms/{roomCode}/join",             // <— replace if different
+      method: "POST",
+      headers: {"Content-Type":"application/json"},   // <— add any extra public headers
+      publicKey: "",                                  // <— only if you have a safe, browser-exposed key
+      bodyTemplate: {"name":"${name}","code":"${roomCode}"}, // <— map to your API
+    };
+
+    function loadConfig(){
+      try{
+        const raw = localStorage.getItem("joiner:config");
+        if(!raw) return {...DEFAULT_CONFIG};
+        const parsed = JSON.parse(raw);
+        return {...DEFAULT_CONFIG, ...parsed};
+      }catch{ return {...DEFAULT_CONFIG}; }
+    }
+    function saveConfig(cfg){
+      localStorage.setItem("joiner:config", JSON.stringify(cfg));
+    }
+    function tplObj(obj, vars){
+      return JSON.parse(JSON.stringify(obj).replace(/\$\{(\w+)\}/g, (_,k)=>vars[k] ?? ""));
+    }
+    function buildUrl(cfg, roomCode){
+      const path = cfg.joinPath.replace("{roomCode}", encodeURIComponent(roomCode));
+      return cfg.baseUrl.replace(/\/+$/,"") + "/" + path.replace(/^\/+/,"");
+    }
+
+    /* ===================== UI HELPERS ===================== */
+    const $ = (s,r=document)=>r.querySelector(s);
+    const elOut = $("#out"), elCfgOut = $("#cfg-out");
+    const toast = $("#toast"), toastMsg = $("#toast-msg");
+    let toTimer;
+    function showToast(msg){ toastMsg.textContent=msg; toast.hidden=false; clearTimeout(toTimer); toTimer=setTimeout(()=>toast.hidden=true,2200); }
+    function setStatus(kind, text){
+      const dot = $("#status-dot"), t = $("#status-text");
+      dot.className = "dot " + (kind||"ok");
+      t.textContent = text || "";
+    }
+    function wireSwitch(wrapSel, inputSel){
+      const wrap=$(wrapSel), input=$(inputSel);
+      const sync=()=>wrap.setAttribute("aria-checked", String(input.checked));
+      wrap.addEventListener("click", ()=>{ input.checked=!input.checked; sync(); });
+      wrap.addEventListener("keydown", e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); input.checked=!input.checked; sync(); }});
+      sync();
+    }
+    wireSwitch("#sw-friendly-wrap", "#sw-friendly");
+    wireSwitch("#sw-remember-wrap", "#sw-remember");
+    wireSwitch("#sw-mock-wrap", "#sw-mock");
+
+    const elRoom=$("#room"), elName=$("#name");
+    const elCfgUrl=$("#cfg-url"), elCfgPath=$("#cfg-path"), elCfgMethod=$("#cfg-method"), elCfgKey=$("#cfg-key"), elCfgBody=$("#cfg-body"), elCfgHdrs=$("#cfg-hdrs");
+
+    /* ===================== INIT ===================== */
+    const CFG = loadConfig();
+    elCfgUrl.value = CFG.baseUrl;
+    elCfgPath.value = CFG.joinPath;
+    elCfgMethod.value = CFG.method;
+    elCfgKey.value = CFG.publicKey || "";
+    elCfgBody.value = JSON.stringify(CFG.bodyTemplate);
+    elCfgHdrs.value = JSON.stringify(CFG.headers);
+
+    // restore last name/code
+    (()=>{
+      try{
+        const saved = JSON.parse(localStorage.getItem("launcher:last")||"null");
+        if(saved){ elRoom.value=saved.room||""; elName.value=saved.name||""; }
+      }catch{}
+    })();
+
+    // hygiene
+    elRoom.addEventListener("input", ()=>{ elRoom.value = elRoom.value.replace(/[^\d\- ]+/g,"").replace(/\s+/g,""); });
+    elName.addEventListener("input", ()=>{ elName.value = elName.value.replace(/[\u0000-\u001F\u007F]/g,""); });
+
+    // reflect mock status
+    const syncMock = ()=>{
+      const mock = $("#sw-mock").checked;
+      setStatus(mock?"warn":"ok", mock ? "Mock Mode is ON (no network calls)" : "Mock Mode is OFF (real API calls enabled)");
+    };
+    $("#sw-mock").addEventListener("change", syncMock); syncMock();
+
+    /* ===================== JOIN ACTION ===================== */
+    async function joinRoomAPI({roomCode, name}){
+      const cfg = loadConfig();
+      const url = buildUrl(cfg, roomCode);
+      const headers = {...cfg.headers};
+      if(cfg.publicKey){ headers["X-Public-Key"] = cfg.publicKey; } // change header name if your doc says otherwise
+      const body = cfg.bodyTemplate ? tplObj(cfg.bodyTemplate, {roomCode, name}) : {roomCode, name};
+      const method = (cfg.method||"POST").toUpperCase();
+      const res = await fetch(url, {method, headers, body: method==="GET" ? undefined : JSON.stringify(body), mode:"cors", credentials:"omit"});
+      const text = await res.text();
+      let data; try{ data = JSON.parse(text); }catch{ data = {raw:text}; }
+      if(!res.ok){
+        const msg = (data && (data.error || data.message)) || ("HTTP "+res.status);
+        const err = new Error(msg); err.status = res.status; err.data = data; throw err;
       }
-      wireSwitch('opt-incognito-wrap', 'opt-incognito');
-      wireSwitch('opt-filter-wrap', 'opt-filter');
+      return data;
+    }
 
-      // Basic sanitization
-      const elRoom = document.getElementById('room');
-      const elName = document.getElementById('name');
+    $("#btn-join").addEventListener("click", async ()=>{
+      const roomCode = elRoom.value.trim();
+      const name = elName.value.trim();
+      if(!roomCode) return showToast("Enter a room code.");
+      if(!name) return showToast("Enter a display name.");
+      if($("#sw-friendly").checked && !/^[a-z0-9 _-]+$/i.test(name)) return showToast("Name must be letters/numbers/spaces/-/_ only.");
 
-      elRoom.addEventListener('input', () => {
-        // allow digits and hyphen; compress spaces
-        elRoom.value = elRoom.value.replace(/[^\d\- ]+/g, '').replace(/\s+/g, '');
-      });
-
-      elName.addEventListener('input', () => {
-        // strip control chars; trim length
-        elName.value = elName.value.replace(/[\u0000-\u001F\u007F]/g, '');
-      });
-
-      // Toast feedback
-      const toast = document.getElementById('toast');
-      const toastContent = document.getElementById('toast-content');
-      let toastTimer;
-      function showToast(msg) {
-        toastContent.textContent = msg;
-        toast.hidden = false;
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => { toast.hidden = true; }, 2400);
+      if($("#sw-remember").checked){
+        try{ localStorage.setItem("launcher:last", JSON.stringify({room:roomCode, name})); }catch{}
+      } else {
+        localStorage.removeItem("launcher:last");
       }
 
-      // Actions
-      document.getElementById('btn-clear').addEventListener('click', () => {
-        elRoom.value = '';
-        elName.value = '';
-        showToast('Cleared.');
-      });
+      elOut.textContent = ""; // clear
+      const mock = $("#sw-mock").checked;
 
-      document.getElementById('btn-join').addEventListener('click', () => {
-        const room = elRoom.value.trim();
-        const name = elName.value.trim();
-
-        if (!room) { showToast('Enter a room code.'); return; }
-        if (!name) { showToast('Enter your display name.'); return; }
-
-        // Front-end-only demo behavior — no network calls.
-        const incognito = document.getElementById('opt-incognito').checked;
-        const friendly = document.getElementById('opt-filter').checked;
-
-        // Simple “friendly names” check (demo)
-        if (friendly && /[^a-z0-9 _\-]/i.test(name)) {
-          showToast('Name must be letters/numbers/space/underscore/hyphen.');
+      try{
+        if(mock){
+          // Simulate latency + success payload
+          setStatus("warn","Mock Mode is ON (simulated join)");
+          await new Promise(r=>setTimeout(r,600));
+          elOut.innerHTML = `<span class="small">[mock]</span> Joined room <b>${roomCode}</b> as <b>${name}</b>.`;
+          showToast("Mock joined.");
           return;
         }
 
-        // Pretend to join successfully
-        showToast(`Joined room ${room} as "${name}"${incognito ? ' (incognito)' : ''}.`);
-      });
-    </script>
-  </body>
+        setStatus("ok","Joining...");
+        const data = await joinRoomAPI({roomCode, name});
+        // Adjust below according to your API's success payload.
+        elOut.innerHTML = `Joined <b>${roomCode}</b> as <b>${name}</b>.<br/><span class="small">Response:</span> <span class="mono">${escapeHtml(JSON.stringify(data))}</span>`;
+        showToast("Joined!");
+        setStatus("ok","Joined successfully.");
+      }catch(err){
+        console.error(err);
+        const msg = err && err.message ? err.message : "Join failed";
+        elOut.innerHTML = `<span class="error">Join failed:</span> <span class="mono">${escapeHtml(msg)}</span>`;
+        setStatus("err","Join failed.");
+        showToast("Join failed.");
+      }
+    });
+
+    $("#btn-clear").addEventListener("click", ()=>{
+      elRoom.value=""; elName.value="";
+      showToast("Cleared.");
+    });
+
+    /* ===================== CONFIG ACTIONS ===================== */
+    $("#btn-save").addEventListener("click", ()=>{
+      try{
+        const next = {
+          baseUrl: elCfgUrl.value.trim(),
+          joinPath: elCfgPath.value.trim(),
+          method: elCfgMethod.value.trim().toUpperCase() || "POST",
+          publicKey: elCfgKey.value.trim(),
+          bodyTemplate: JSON.parse(elCfgBody.value || "{}"),
+          headers: JSON.parse(elCfgHdrs.value || "{}"),
+        };
+        saveConfig(next);
+        elCfgOut.textContent = "Saved.";
+        showToast("Config saved.");
+      }catch(e){
+        elCfgOut.textContent = "Invalid JSON in body/headers.";
+      }
+    });
+
+    $("#btn-reset").addEventListener("click", ()=>{
+      saveConfig(DEFAULT_CONFIG);
+      elCfgUrl.value = DEFAULT_CONFIG.baseUrl;
+      elCfgPath.value = DEFAULT_CONFIG.joinPath;
+      elCfgMethod.value = DEFAULT_CONFIG.method;
+      elCfgKey.value = DEFAULT_CONFIG.publicKey || "";
+      elCfgBody.value = JSON.stringify(DEFAULT_CONFIG.bodyTemplate);
+      elCfgHdrs.value = JSON.stringify(DEFAULT_CONFIG.headers);
+      elCfgOut.textContent = "Reset to defaults.";
+      showToast("Config reset.");
+    });
+
+    $("#btn-test").addEventListener("click", async ()=>{
+      const roomCode = elRoom.value.trim() || "000000";
+      const name = elName.value.trim() || "Tester";
+      if($("#sw-mock").checked){
+        elCfgOut.textContent = "Mock Mode is ON — toggle it off to test.";
+        return;
+      }
+      try{
+        setStatus("ok","Testing connectivity...");
+        const result = await joinRoomAPI({roomCode, name});
+        elCfgOut.innerHTML = `OK. Response: <span class="mono">${escapeHtml(JSON.stringify(result))}</span>`;
+        setStatus("ok","Connectivity OK.");
+        showToast("API OK");
+      }catch(e){
+        elCfgOut.innerHTML = `<span class="error">Error:</span> <span class="mono">${escapeHtml(e.message||"request failed")}</span>`;
+        setStatus("err","Connectivity error.");
+        showToast("Test failed");
+      }
+    });
+
+    /* ===================== UTILS ===================== */
+    function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  </script>
+</body>
 </html>
