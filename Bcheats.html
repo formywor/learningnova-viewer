@@ -1,329 +1,65 @@
 <!doctype html>
-<html lang="en" prefix="og: https://ogp.me/ns#">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Authorized Room Join (Frontend-Only)</title>
-  <meta name="description" content="Ad-free, frontend-only join tool with auto method fallback." />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
-
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Room Join</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet"/>
   <style>
-    :root{--bg:#0b1220;--panel:#10192b;--panel2:#0e1728;--text:#eef2ff;--muted:#9fb0cf;--brand:#5b8cff;--brand2:#6f97ff;--ok:#17c964;--warn:#f5a524;--err:#e5484d;--ring:rgba(123,168,255,.5)}
+    :root{--bg:#0b1220;--panel:#10192b;--text:#eef2ff;--muted:#9fb0cf;--brand:#5b8cff;--err:#e5484d}
     *{box-sizing:border-box}html,body{height:100%}
-    body{margin:0;font-family:Nunito,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:
-      radial-gradient(1000px 1000px at 120% -10%, #223458 0%, transparent 60%),
-      radial-gradient(800px 800px at -15% 120%, #162443 0%, transparent 60%),
-      linear-gradient(180deg,#0b1220,#0a1020);
-      color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-    .wrap{max-width:880px;margin:0 auto;padding:28px 16px}
-    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-    .logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));font-weight:900;box-shadow:0 10px 26px rgba(91,140,255,.35)}
-    .title{font-weight:900;font-size:20px}.sub{font-size:12px;color:var(--muted);margin-top:2px}
-    .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;margin-top:14px;box-shadow:0 18px 48px rgba(2,12,33,.6), inset 0 1px 0 rgba(255,255,255,.04)}
-    .head{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:900}
-    .body{padding:16px;display:grid;gap:14px}
-    .grid{display:grid;gap:12px}.g2{grid-template-columns:1fr}@media(min-width:720px){.g2{grid-template-columns:1fr 1fr}}
-    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-    .input input{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:var(--text);border-radius:12px;outline:none;font-weight:800;transition:.2s border,.2s box-shadow,.2s background}
-    .input input:focus{border-color:rgba(123,168,255,.6);box-shadow:0 0 0 4px var(--ring);background:rgba(255,255,255,.07)}
-    .switch{display:flex;align-items:center;gap:10px}.switch input{display:none}
-    .track{width:52px;height:28px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);position:relative}
-    .thumb{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.25s transform;box-shadow:0 6px 16px rgba(0,0,0,.25)}
-    .switch input:checked + .track{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent}
-    .switch input:checked + .track .thumb{transform:translateX(24px)}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;transition:transform .06s,opacity .2s,box-shadow .2s}
-    .btn:active{transform:translateY(1px) scale(.995)}.btn--ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:var(--text)}
-    .btn--primary{background:linear-gradient(135deg,#bcd0ff,#8fb0ff 60%,#6f97ff);color:#0b1220;box-shadow:0 14px 28px rgba(91,140,255,.35)}
-    .status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%}.ok{background:var(--ok)}.warn{background:var(--warn)}.err{background:var(--err)}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.error{color:#ffadad}
-    .errorBar{position:fixed;left:0;right:0;bottom:-70px;z-index:50;color:#fff;background-color:#e84135;min-height:55px;padding:12px 16px;display:flex;align-items:center;justify-content:center;font-weight:800;transition:.2s transform;transform:translateY(0)}
-    .errorBar.show{transform:translateY(-70px)}
+    body{margin:0;background:linear-gradient(180deg,#0b1220,#0a1020);color:var(--text);font-family:Nunito,system-ui}
+    .wrap{max-width:560px;margin:0 auto;padding:28px 16px}
+    h1{margin:0 0 16px 0;font-size:22px}
+    .card{background:linear-gradient(180deg,var(--panel),#0e1728);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
+    label{font-size:12px;color:var(--muted);display:block;margin:10px 0 6px}
+    input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--text);outline:none;font-weight:800}
+    input:focus{border-color:rgba(123,168,255,.6);box-shadow:0 0 0 4px rgba(123,168,255,.35)}
+    .row{display:grid;gap:12px}
+    .btn{margin-top:14px;width:100%;padding:12px 16px;border-radius:12px;border:0;background:linear-gradient(135deg,#bcd0ff,#6f97ff);color:#071225;font-weight:900;cursor:pointer}
+    .out{margin-top:12px;font-size:12px;color:var(--muted);white-space:pre-wrap;word-break:break-word}
+    .err{color:var(--err)}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="logo">★</div>
-      <div>
-        <div class="title">Authorized Room Join</div>
-        <div class="sub">Frontend-only • Auto method fallback</div>
-      </div>
-    </header>
-
-    <!-- JOIN -->
-    <section class="card">
-      <div class="head">Join a Room</div>
-      <div class="body">
-        <div class="grid g2">
-          <div><label for="gcode">Enter code</label><div class="input"><input id="gcode" placeholder="Game ID" maxlength="12" inputmode="numeric" autocomplete="off"/></div></div>
-          <div><label for="gname">Nickname</label><div class="input"><input id="gname" placeholder="Nickname" maxlength="24" autocomplete="off"/></div></div>
-        </div>
-
-        <div class="grid">
-          <div class="switch" id="sw-incog-wrap" role="switch" aria-checked="true" tabindex="0">
-            <input type="checkbox" id="icogmode" checked /><span class="track"><span class="thumb"></span></span><span>Incognito Mode</span>
-          </div>
-        </div>
-
-        <div class="status"><span class="dot warn" id="status-dot"></span><span id="status-text">Ready.</span></div>
-
-        <div class="actions">
-          <button class="btn btn--ghost" id="btn-clear">Clear</button>
-          <button class="btn btn--primary" onclick="join();" role="button">Join</button>
-        </div>
-
-        <div id="out" class="mono" style="font-size:12px;"></div>
-      </div>
-    </section>
-
-    <!-- CONFIG -->
-    <section class="card">
-      <div class="head">API Configuration (auto + fallback)</div>
-      <div class="body">
-        <p class="mono" style="font-size:12px;color:#9fb0cf;margin:0">It will try these in order until one works. You can also Save a custom one.</p>
-        <div class="grid g2">
-          <div>
-            <label for="cfg-url">Primary URL (optional)</label>
-            <div class="input"><input id="cfg-url" placeholder="https://official.example.com/join"/></div>
-          </div>
-          <div>
-            <label for="cfg-method">Method</label>
-            <div class="input"><input id="cfg-method" placeholder="AUTO (POST/GET)"/></div>
-          </div>
-        </div>
-        <div class="grid g2">
-          <div>
-            <label for="cfg-hdrs">Headers (JSON for POST)</label>
-            <div class="input"><input id="cfg-hdrs" class="mono" value='{"Content-Type":"application/json"}'/></div>
-          </div>
-          <div>
-            <label for="cfg-body">POST Body Template (JSON)</label>
-            <div class="input"><input id="cfg-body" class="mono" value='{"code":"${code}","name":"${name}"}'/></div>
-          </div>
-        </div>
-        <div class="grid g2">
-          <div>
-            <label for="cfg-qry">GET Query Template</label>
-            <div class="input"><input id="cfg-qry" class="mono" value='code=${code}&name=${name}'/></div>
-          </div>
-          <div>
-            <label for="cfg-alt">Alternate URL candidates (comma)</label>
-            <div class="input"><input id="cfg-alt" class="mono" placeholder="/api/join,/join,/v1/join"/></div>
-          </div>
-        </div>
-        <div class="actions" style="margin-top:6px">
-          <button class="btn btn--ghost" id="btn-save">Save</button>
-          <button class="btn btn--ghost" id="btn-reset">Reset</button>
-          <button class="btn btn--primary" id="btn-test">Probe</button>
-        </div>
-        <div id="cfg-out" class="mono" style="font-size:12px;"></div>
-      </div>
-    </section>
+    <h1>Join a Room</h1>
+    <div class="card">
+      <label for="code">Code</label>
+      <input id="code" placeholder="Game ID" inputmode="numeric" maxlength="12"/>
+      <label for="name">Nickname</label>
+      <input id="name" placeholder="Nickname" maxlength="24"/>
+      <button class="btn" id="join">Join</button>
+      <div id="out" class="out"></div>
+    </div>
   </div>
 
-  <div class="errorBar" id="error"></div>
-
   <script>
-    /* ---------- utils ---------- */
-    const qs = s=>document.querySelector(s);
-    const escapeHtml = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    function errorBar(msg){ const e=qs("#error"); e.textContent=msg; e.classList.add("show"); clearTimeout(errorBar._t); errorBar._t=setTimeout(()=>e.classList.remove("show"), 3500); }
-    function setStatus(kind,text){ qs("#status-dot").className="dot "+kind; qs("#status-text").textContent=text; }
-    function saveCfg(cfg){ localStorage.setItem("roomjoin:cfg", JSON.stringify(cfg)); }
-    function loadCfg(){ try{return JSON.parse(localStorage.getItem("roomjoin:cfg")||"null")}catch{return null} }
-    function tplReplace(str, vars){ return String(str).replace(/\$\{(\w+)\}/g,(m,k)=>encodeURIComponent(vars[k] ?? "")); }
-
-    /* ---------- default fallback patterns (no backend) ---------- */
-    const DEFAULTS = {
-      urlPrimary: "",
-      method: "AUTO",
-      headers: {"Content-Type":"application/json"},
-      bodyTemplate: {"code":"${code}","name":"${name}"},
-      queryTemplate: "code=${code}&name=${name}",
-      altUrls: ["/api/join","/join","/v1/join"] // same-origin guesses
-    };
-
-    // Load UI from saved or defaults
-    (function initUI(){
-      const cfg = loadCfg() || DEFAULTS;
-      qs("#cfg-url").value = cfg.urlPrimary || "";
-      qs("#cfg-method").value = cfg.method || "AUTO";
-      qs("#cfg-hdrs").value = JSON.stringify(cfg.headers||{"Content-Type":"application/json"});
-      qs("#cfg-body").value = JSON.stringify(cfg.bodyTemplate||{"code":"${code}","name":"${name}"});
-      qs("#cfg-qry").value = cfg.queryTemplate || "code=${code}&name=${name}";
-      qs("#cfg-alt").value = (cfg.altUrls||[]).join(",");
-      setStatus("warn","Configure or use auto fallback.");
-    })();
-
-    // buttons
-    qs("#btn-clear").addEventListener("click",()=>{ qs("#gcode").value=""; qs("#gname").value=""; });
-    qs("#btn-save").addEventListener("click",()=>{
-      try{
-        const cfg = {
-          urlPrimary: qs("#cfg-url").value.trim(),
-          method: (qs("#cfg-method").value.trim()||"AUTO").toUpperCase(),
-          headers: JSON.parse(qs("#cfg-hdrs").value||"{}"),
-          bodyTemplate: JSON.parse(qs("#cfg-body").value||'{"code":"${code}","name":"${name}"}'),
-          queryTemplate: qs("#cfg-qry").value||"code=${code}&name=${name}",
-          altUrls: (qs("#cfg-alt").value||"").split(",").map(s=>s.trim()).filter(Boolean)
-        };
-        saveCfg(cfg);
-        qs("#cfg-out").textContent="Saved.";
-        setStatus("ok","Config saved.");
-      }catch{ qs("#cfg-out").textContent="Invalid JSON in headers/body."; }
-    });
-    qs("#btn-reset").addEventListener("click",()=>{
-      localStorage.removeItem("roomjoin:cfg");
-      qs("#cfg-url").value = "";
-      qs("#cfg-method").value = "AUTO";
-      qs("#cfg-hdrs").value = JSON.stringify(DEFAULTS.headers);
-      qs("#cfg-body").value = JSON.stringify(DEFAULTS.bodyTemplate);
-      qs("#cfg-qry").value = DEFAULTS.queryTemplate;
-      qs("#cfg-alt").value = DEFAULTS.altUrls.join(",");
-      qs("#cfg-out").textContent="Reset to defaults.";
-      setStatus("warn","Reset — using fallback list.");
-    });
-
-    qs("#btn-test").addEventListener("click", async ()=>{
-      const cfg = loadCfg() || DEFAULTS;
-      const url = cfg.urlPrimary || cfg.altUrls[0] || "";
-      if(!url){ qs("#cfg-out").textContent = "No URL to probe."; return; }
-      try{
-        const res = await fetch(url, {method:"GET", mode:"cors", credentials:"omit"});
-        qs("#cfg-out").textContent = `Probe: ${res.type==="opaque" ? "opaque (no-cors/CORS blocked)" : "HTTP "+res.status}`;
-      }catch{ qs("#cfg-out").textContent = "Probe failed to fetch (likely CORS or offline)."; }
-    });
-
-    // switches a11y
-    (function wireSwitch(){
-      const wrap=qs("#sw-incog-wrap"); const input=qs("#icogmode");
-      const sync=()=>wrap.setAttribute("aria-checked", String(input.checked));
-      wrap.addEventListener("click",()=>{input.checked=!input.checked;sync();});
-      wrap.addEventListener("keydown",e=>{ if(e.key===" "||e.key==="Enter"){e.preventDefault();input.checked=!input.checked;sync();}});
-      sync();
-    })();
-
-    // JOIN flow with automatic fallback
-    async function join(){
-      const code = qs("#gcode").value.trim();
-      const name = qs("#gname").value.trim();
-      if(!code){ errorBar("Enter a code."); return; }
-      if(!name){ errorBar("Enter a nickname."); return; }
-      if(!/^[a-z0-9 _-]+$/i.test(name)){ errorBar("Nickname must be letters/numbers/spaces/-/_ only."); return; }
-
-      const cfg = loadCfg() || DEFAULTS;
-      const attempts = buildAttempts(cfg, {code, name});
-
-      qs("#out").innerHTML = "";
-      setStatus("ok","Trying "+attempts.length+" pattern(s)…");
-
-      let lastErr = "No attempt made.";
-      for(const a of attempts){
-        try{
-          const res = await fetch(a.url, a.opts);
-          // If CORS blocks, res.type may be 'opaque' when mode:'no-cors' (we don't use no-cors here).
-          const text = await res.text().catch(()=> "");
-          let data; try{ data = JSON.parse(text); }catch{ data = text || ""; }
-
-          if(res.ok){
-            qs("#out").innerHTML = `Joined <b>${escapeHtml(code)}</b> as <b>${escapeHtml(name)}</b>.<br><span class="mono">${escapeHtml(typeof data==="string"?data:JSON.stringify(data))}</span>`;
-            setStatus("ok","Joined successfully.");
-            try{ localStorage.setItem("roomjoin:last", JSON.stringify({code,name})); }catch{}
-            return;
-          } else {
-            lastErr = `HTTP ${res.status} via ${a.info}`;
-            // If 405 from POST, we’ll naturally try the GET variant next in attempts.
-          }
-        }catch(e){
-          lastErr = `Failed to fetch via ${a.info} (likely CORS/URL).`;
-        }
-      }
-
-      qs("#out").innerHTML = `<span class="error">Join failed:</span> <span class="mono">${escapeHtml(lastErr)}</span>`;
-      setStatus("err","Join failed.");
-      errorBar("Join failed — see details above.");
+    const qs = s => document.querySelector(s);
+    function show(msg, isErr=false){
+      qs('#out').innerHTML = isErr ? '<span class="err">'+msg+'</span>' : msg;
     }
-
-    function buildAttempts(cfg, vars){
-      const attempts = [];
-      const methodPref = (cfg.method||"AUTO").toUpperCase();
-      const urls = [];
-      if(cfg.urlPrimary) urls.push(cfg.urlPrimary);
-      (cfg.altUrls||[]).forEach(u=>urls.push(u));
-
-      if(urls.length===0) urls.push("/api/join","/join","/v1/join");
-
-      const hdrs = cfg.headers || {"Content-Type":"application/json"};
-
-      const postFirst = (methodPref==="POST" || methodPref==="AUTO");
-      const getFirst  = (methodPref==="GET");
-
-      // Helper to push attempts
-      const pushPOST = (u)=>{
-        attempts.push({
-          info: `POST ${u}`,
-          url: absUrl(u),
-          opts: { method:"POST", headers: hdrs, body: JSON.stringify(applyBody(cfg.bodyTemplate, vars)), mode:"cors", credentials:"omit" }
+    qs('#join').addEventListener('click', async ()=>{
+      const code = qs('#code').value.trim();
+      const name = qs('#name').value.trim();
+      if(!code || !name){ show('Enter both code and nickname.', true); return; }
+      show('Joining…');
+      try{
+        const res = await fetch('/api/join', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ code, name })
         });
-      };
-      const pushGET = (u)=>{
-        const q = cfg.queryTemplate || "code=${code}&name=${name}";
-        const full = appendQuery(absUrl(u), tplReplace(q, vars));
-        attempts.push({
-          info: `GET ${full}`,
-          url: full,
-          opts: { method:"GET", mode:"cors", credentials:"omit" }
-        });
-      };
-
-      urls.forEach(u=>{
-        if(postFirst){ pushPOST(u); pushGET(u); }
-        else if(getFirst){ pushGET(u); pushPOST(u); }
-        else { pushPOST(u); pushGET(u); } // fallback
-      });
-
-      return attempts;
-    }
-
-    function applyBody(tpl, vars){
-      try{
-        // deep replace `${var}` in JSON
-        const raw = JSON.stringify(tpl);
-        const replaced = raw.replace(/\$\{(\w+)\}/g,(m,k)=>vars[k] ?? "");
-        return JSON.parse(replaced);
-      }catch{
-        // if user typed plain string, try template replace
-        if(typeof tpl==="string"){
-          try{ return JSON.parse(tplReplace(tpl, vars)); }catch{ return {code:vars.code,name:vars.name}; }
+        const data = await res.json().catch(()=>({}));
+        if(res.ok){
+          show('Joined successfully.\n\n'+JSON.stringify(data, null, 2));
+        }else{
+          show(`Join failed: HTTP ${res.status}\n${(data && (data.error || JSON.stringify(data))) || ''}`, true);
         }
-        return {code:vars.code,name:vars.name};
+      }catch(e){
+        show('Network error: '+(e && e.message ? e.message : e), true);
       }
-    }
-
-    function absUrl(u){
-      try{ return new URL(u, location.href).href; }catch{ return u; }
-    }
-    function appendQuery(u, qstr){
-      if(!qstr) return u;
-      return u + (u.includes("?") ? "&" : "?") + qstr;
-    }
-    window.join = join;
-
-    // Prefill from URL (?code=...&name=...)
-    (function prefillJoin(){
-      const sp = new URLSearchParams(location.search);
-      const urlcode = sp.get("code"); const urlname = sp.get("name");
-      if(urlcode) qs("#gcode").value = urlcode;
-      if(urlname) qs("#gname").value = urlname;
-      try{
-        const last = JSON.parse(localStorage.getItem("roomjoin:last")||"null");
-        if(last){
-          if(!urlcode) qs("#gcode").value = last.code || "";
-          if(!urlname) qs("#gname").value = last.name || "";
-        }
-      }catch{}
-    })();
+    });
   </script>
 </body>
 </html>
