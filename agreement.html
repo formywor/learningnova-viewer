@@ -60,6 +60,7 @@
   .btn.primary{background:linear-gradient(180deg,#1b4760,#15384e);border-color:rgba(125,211,252,.35)}
   .btn.danger{background:linear-gradient(180deg,#5e1a1a,#421515);border-color:rgba(239,68,68,.45)}
   .badge{font-size:.8rem;border:1px solid rgba(255,255,255,.18);padding:2px 8px;border-radius:999px;color:#cbd5e1}
+  .badge.pending{border-color:rgba(245,158,11,.45);color:#fde68a}
   .note{font-size:.9rem;color:#b9c7d6}
   .small{font-size:.85rem}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -83,91 +84,166 @@
 <div class="wrap">
   <div class="content">
     <h1>Organization/School Opt-Out Agreement (ScriptNova)</h1>
-    <p class="muted small">Version 1.0 • Last updated: <span id="today"></span> • This Agreement governs the process by which an educational institution, district, or organization (“<strong>Requester</strong>”) elects to opt out of ScriptNova services for some or all of its users.</p>
+    <p class="muted small">Version 1.1 • Last updated: <span id="today"></span> • This Agreement governs the process by which an educational institution, district, or organization (“<strong>Requester</strong>”) elects to opt out of ScriptNova services for some or all of its users.</p>
 
     <div class="callout">
-      <strong>Notice:</strong> One (1) school is currently <em>opted out by default</em> and was reviewed and approved by ScriptNova admin <strong>David Y</strong>. Approved opt-outs are listed below for transparency.
+      <strong>Notice:</strong> One (1) school is currently <em>opted out by default</em>—<strong>Short Pump Middle School</strong>—reviewed and approved by ScriptNova admin <strong>David Y</strong>. An additional request for <strong>Godwin High School</strong> is marked <em>Pending review</em>. Approved entries appear below.
     </div>
 
     <div class="grid">
       <div class="box">
+        <!-- BEGIN LONG-FORM AGREEMENT -->
         <h2>1. Purpose and Scope</h2>
-        <p>This Organization/School Opt-Out Agreement (“<strong>Agreement</strong>”) establishes the terms, assurances, and representations under which the Requester instructs ScriptNova to disable, restrict, or cease service provision for covered users, systems, devices, and/or networks under the Requester’s control. This Agreement applies to ScriptNova websites, applications, APIs, integrations, and related services (“<strong>Services</strong>”).</p>
+        <p>
+          This Organization/School Opt-Out Agreement (“<strong>Agreement</strong>”) sets out the terms under which the Requester instructs ScriptNova to restrict, disable, or otherwise prevent availability of ScriptNova services to a defined set of users, devices, networks, and/or domains within the Requester’s authority.
+          The Agreement covers ScriptNova web properties, applications, APIs, SDKs, connectors, integrations, and ancillary services (collectively, the “<strong>Services</strong>”).
+        </p>
 
         <h2>2. Definitions</h2>
         <ul class="list-tight">
-          <li><strong>Requester</strong>: The educational institution, district, or organization submitting a valid opt-out request.</li>
-          <li><strong>Covered Users</strong>: Students, staff, contractors, or affiliates under the Requester’s authority and within scope of the opt-out.</li>
-          <li><strong>Opt-Out</strong>: A directive to ScriptNova to restrict or disable the Services for Covered Users, subject to technical feasibility.</li>
-          <li><strong>Personal Data</strong> / <strong>Personally Identifiable Information (PII)</strong>: Any information that identifies or can reasonably identify a natural person, consistent with applicable laws.</li>
+          <li><strong>Requester</strong>: The institution, district, or organization submitting a valid opt-out request under an authorized representative’s signature.</li>
+          <li><strong>Covered Users</strong>: Individuals (students, staff, contractors, volunteers, or affiliates) within the Requester’s remit and within the scope declared in the submission form.</li>
+          <li><strong>Identifiers</strong>: Data the Requester supplies to effect the opt-out, which may include domains, email suffixes, IP/CIDR ranges, device identifiers, SIS IDs, or roster metadata.</li>
+          <li><strong>Personal Data / PII</strong>: Information that identifies or reasonably can identify a natural person, as defined by applicable law.</li>
+          <li><strong>Processing</strong>: Any operation or set of operations performed on Personal Data, such as collection, storage, use, disclosure, or deletion.</li>
         </ul>
 
-        <h2>3. Legal and Regulatory Context (Informational Only)</h2>
-        <p><em>Nothing in this section is legal advice.</em> Requester remains responsible for its own legal compliance. Depending on jurisdiction, the following frameworks may apply:</p>
-        <ul>
-          <li><strong>FERPA</strong> (U.S.): Protects student education records; schools/districts are data controllers of such records.</li>
-          <li><strong>COPPA</strong> (U.S.): Governs online collection from children under 13; schools may act in loco parentis in limited contexts.</li>
-          <li><strong>CCPA/CPRA</strong> (California): Provides rights to California residents regarding personal information; applies to certain entities/processors.</li>
-          <li><strong>GDPR</strong> (EU/EEA): Sets obligations for controllers/processors of personal data and data subject rights, with potential extra-territorial scope.</li>
-          <li>Other state/provincial, national, and sector-specific privacy and security laws may apply.</li>
-        </ul>
-
-        <h2>4. Representations and Authority</h2>
+        <h2>3. Legal and Regulatory Background (Informational)</h2>
+        <p>
+          This section summarizes common frameworks that may be relevant to educational institutions and is provided for context only; it is not legal advice.
+          Requester remains responsible for determining its own compliance obligations and obtaining independent counsel where needed.
+        </p>
         <ol>
-          <li>Requester represents it has lawful authority to bind the institution and to direct ScriptNova to implement the Opt-Out for Covered Users.</li>
-          <li>Requester warrants its request is accurate, complete, and within its jurisdictional and contractual rights.</li>
-          <li>Requester agrees to indemnify ScriptNova for claims arising from inaccuracies in authority or scope of the request.</li>
+          <li><strong>FERPA (U.S.)</strong>: Governs education records maintained by educational agencies/institutions. Schools typically act as data controllers of education records.</li>
+          <li><strong>COPPA (U.S.)</strong>: Addresses online data collection from children under 13. Schools may give consent on behalf of parents in limited educational contexts.</li>
+          <li><strong>CCPA/CPRA (California)</strong>: Provides specific rights to California residents regarding personal information and regulates certain businesses/service providers.</li>
+          <li><strong>GDPR (EU/EEA, as applicable)</strong>: Establishes controller/processor obligations and data subject rights, with potential extra-territorial reach.</li>
+          <li><strong>State/Provincial Student Privacy Laws</strong>: Many jurisdictions impose sector-specific requirements on vendors serving K-12.</li>
         </ol>
 
-        <h2>5. Scope of Opt-Out</h2>
-        <p>Requester may elect to opt out by domain(s), email suffix(es), IP/CIDR ranges, device IDs, SIS rosters, or other identifiers. The <em>scope</em> provided below in the submission form becomes incorporated into this Agreement upon acceptance by ScriptNova.</p>
-
-        <h2>6. Service Limitations and Technical Feasibility</h2>
-        <p>ScriptNova will make commercially reasonable efforts to implement the Opt-Out promptly upon verification. Some functionality may be technically infeasible to disable in full (e.g., content available on the open internet, third-party caches, or services outside ScriptNova’s control). ScriptNova will document any limitations in its approval response.</p>
-
-        <h2>7. Data Handling, Deletion, and Retention</h2>
+        <h2>4. Authority and Representations</h2>
         <ol>
-          <li>Upon a valid Opt-Out, ScriptNova will cease new processing for Covered Users within scope and begin suppression/deny-lists as technically feasible.</li>
-          <li>Existing logs/records may be retained for security, audit, legal defense, or compliance for a limited retention period, after which they will be minimized or deleted consistent with ScriptNova policy.</li>
-          <li>Requester may submit specific deletion directives where applicable law grants such rights; ScriptNova will evaluate and respond accordingly.</li>
+          <li>Requester represents it has actual authority to bind its institution and to direct ScriptNova to implement an Opt-Out for the scope it asserts.</li>
+          <li>Requester warrants the identifiers it supplies are accurate, complete, and limited to populations it lawfully controls or represents.</li>
+          <li>Requester agrees to indemnify ScriptNova against claims arising from inaccurate assertions of authority, mis-scoping, or unlawful requests.</li>
         </ol>
 
-        <h2>8. Security and Incident Response</h2>
-        <p>ScriptNova maintains reasonable technical and organizational measures designed to protect data against unauthorized access, disclosure, alteration, and destruction. In the event of a security incident affecting Covered Users, ScriptNova will notify Requester consistent with its incident response procedures and applicable law.</p>
+        <h2>5. Scope of Opt-Out and Technical Means</h2>
+        <p>
+          The Opt-Out may be implemented using one or more approaches: deny-listing organization email domains, restricting account creation/use, suppressing traffic by IP/CIDR, filtering device identifiers, or honoring roster-based rules.
+          ScriptNova will use commercially reasonable efforts to honor the requested scope upon successful verification, subject to Section 6 (Limitations).
+        </p>
 
-        <h2>9. No Admission; No Waiver</h2>
-        <p>Implementation of an Opt-Out is not an admission of non-compliance by either party and shall not waive any rights, defenses, or objections available at law or in equity.</p>
-
-        <h2>10. Mutual Cooperation</h2>
-        <p>Requester agrees to cooperate in verifying organizational control (e.g., email/domain validation, DNS TXT record, signed letter on letterhead, or comparable proof). ScriptNova agrees to act in good faith to implement the Opt-Out without undue delay after verification.</p>
-
-        <h2>11. Third-Party Services and Links</h2>
-        <p>To the extent the Services interface with third-party platforms, Requester acknowledges ScriptNova cannot dictate those platforms’ independent practices; the Opt-Out will apply to ScriptNova’s own systems and integrations under its control.</p>
-
-        <h2>12. Disclaimer of Warranties</h2>
-        <p>THE SERVICES ARE PROVIDED “AS IS.” SCRIPTNOVA DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY LAW.</p>
-
-        <h2>13. Limitation of Liability</h2>
-        <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, NEITHER PARTY SHALL BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES. SCRIPTNOVA’S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL NOT EXCEED USD $100 OR THE AMOUNTS PAID BY REQUESTER FOR THE SERVICES IN THE 12 MONTHS PRECEDING THE CLAIM, WHICHEVER IS GREATER.</p>
-
-        <h2>14. Term, Termination, and Reversal</h2>
-        <ul>
-          <li>This Agreement is effective upon ScriptNova’s written approval of the Requester’s submission.</li>
-          <li>Requester may request reversal (opt-in) in writing by an authorized representative, subject to re-verification.</li>
-          <li>ScriptNova may suspend or terminate this Agreement if the submission was fraudulent, unlawful, or materially misleading.</li>
+        <h2>6. Limitations and Exclusions</h2>
+        <ul class="list-tight">
+          <li>ScriptNova cannot control third-party platforms or open web content outside its systems. An Opt-Out applies to ScriptNova-operated systems and integrations under ScriptNova’s control.</li>
+          <li>Caching, content mirrors, archived data, or independent user actions may create residual exposure that is not fully eliminable by ScriptNova.</li>
+          <li>Where perfect technical enforcement is infeasible, ScriptNova will document residual risk and the measures implemented.</li>
         </ul>
 
-        <h2>15. Notices</h2>
-        <p>Formal notices may be provided via verified organizational email, signed PDF on official letterhead, or other mutually agreed channels. Operational confirmations (including status updates) may be provided via the contact details submitted below.</p>
+        <h2>7. Verification and Proof</h2>
+        <p>
+          ScriptNova may require reasonable proof of organizational control before enforcement, which could include one or more of: response from an email at the asserted domain, DNS TXT record, signed letter on official letterhead, or a verifiable district ticket ID.
+          ScriptNova may refuse or pause enforcement until verification is complete.
+        </p>
 
-        <h2>16. Governing Law and Venue</h2>
-        <p>Unless otherwise required by applicable law, this Agreement will be governed by the laws of the State in which ScriptNova principally operates, excluding conflict-of-law rules. Venue will lie in the courts of competent jurisdiction in that State.</p>
+        <h2>8. Data Handling and Retention</h2>
+        <ol>
+          <li>Upon approval, ScriptNova will cease new Processing for Covered Users within scope and apply appropriate suppression lists.</li>
+          <li>Security, audit, and fraud logs may be retained for a limited period to satisfy legal and operational obligations, then minimized or deleted in line with ScriptNova policy.</li>
+          <li>Requester may submit lawful deletion requests where applicable; ScriptNova will evaluate and respond consistent with governing law.</li>
+        </ol>
 
-        <h2>17. Entire Agreement; Order of Precedence</h2>
-        <p>This Agreement, together with any incorporated forms or written approvals, constitutes the entire agreement with respect to the Opt-Out. In case of conflict between this Agreement and any conflicting terms on general marketing pages, this Agreement controls.</p>
+        <h2>9. Security Measures and Incident Response</h2>
+        <p>
+          ScriptNova maintains administrative, technical, and physical safeguards designed to protect data against unauthorized access and misuse. If an incident materially affecting Covered Users is identified, ScriptNova will notify Requester consistent with applicable law and its incident procedures.
+        </p>
 
-        <h2>18. Amendments and Updates</h2>
-        <p>ScriptNova may update this Agreement to reflect legal or operational changes. Material changes will be published, and continued use of the Opt-Out process after publication constitutes acceptance of the updated terms.</p>
+        <h2>10. Student and Parent/Guardian Considerations</h2>
+        <ul class="list-tight">
+          <li>For K-12, Requester is responsible for ensuring parental/guardian notices or consents are handled as required by law or policy.</li>
+          <li>Requester acknowledges that individual families may still interact with public web content beyond ScriptNova’s control.</li>
+        </ul>
+
+        <h2>11. Third-Party Services</h2>
+        <p>
+          Where the Services interface with third-party platforms, those platforms’ policies govern their own Processing.
+          ScriptNova’s obligations extend to systems it operates or controls.
+        </p>
+
+        <h2>12. Service Changes and Deprecations</h2>
+        <p>
+          ScriptNova may alter or deprecate features from time to time. Opt-Out commitments will track materially equivalent controls where available; if not available, ScriptNova will document any enforcement gaps.
+        </p>
+
+        <h2>13. Disclaimer of Warranties</h2>
+        <p>
+          THE SERVICES AND OPT-OUT IMPLEMENTATIONS ARE PROVIDED “AS IS” AND “AS AVAILABLE.” SCRIPTNOVA DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY LAW.
+        </p>
+
+        <h2>14. Limitation of Liability</h2>
+        <p>
+          TO THE MAXIMUM EXTENT PERMITTED BY LAW, NEITHER PARTY WILL BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES.
+          SCRIPTNOVA’S TOTAL LIABILITY RELATING TO THIS AGREEMENT WILL NOT EXCEED THE GREATER OF USD $100 OR THE AMOUNT PAID BY REQUESTER FOR THE SERVICES IN THE 12 MONTHS PRECEDING THE CLAIM.
+        </p>
+
+        <h2>15. Term, Termination, and Reversal</h2>
+        <ul class="list-tight">
+          <li>This Agreement becomes effective upon ScriptNova’s written approval of Requester’s submission.</li>
+          <li>Requester may later request a reversal (opt-in) by authorized notice; ScriptNova may re-verify authority.</li>
+          <li>ScriptNova may suspend or terminate enforcement if a submission is fraudulent, unlawful, or materially misleading.</li>
+        </ul>
+
+        <h2>16. Notices</h2>
+        <p>
+          Formal notices should be transmitted from a verified organizational channel (e.g., official email domain) or as a signed PDF on letterhead.
+          Operational updates (acknowledgements, status, questions) may be sent to the contact designated in the submission form.
+        </p>
+
+        <h2>17. Dispute Resolution</h2>
+        <p>
+          The Parties will attempt to resolve disputes in good faith through administrative contacts first. If unresolved, either Party may seek relief in a court of competent jurisdiction as designated in Section 19.
+        </p>
+
+        <h2>18. Changes to this Agreement</h2>
+        <p>
+          ScriptNova may update this Agreement to reflect operational or legal changes. Material updates will be posted.
+          Continued use of the opt-out intake after publication constitutes acceptance of the updated terms.
+        </p>
+
+        <h2>19. Governing Law and Venue</h2>
+        <p>
+          Unless applicable law requires otherwise, this Agreement is governed by the law of the State in which ScriptNova principally operates, excluding conflict-of-law rules.
+          Venue lies in the courts of that State.
+        </p>
+
+        <h2>20. Entire Agreement; Order of Precedence</h2>
+        <p>
+          This Agreement and the verified submission (including the declared scope and identifiers) constitute the entire agreement regarding the Opt-Out.
+          If a conflict arises between marketing pages and this Agreement, this Agreement controls.
+        </p>
+
+        <h2>21. Operational Annexes (Informational)</h2>
+        <h3>Annex A — Example Identifier Types</h3>
+        <ul class="list-tight">
+          <li>Email domains and subdomains (e.g., <span class="mono">district.k12.us</span>)</li>
+          <li>IP ranges (CIDR notation), NAT egress IPs used by the Requester</li>
+          <li>Device IDs or MDM-exported identifiers (hashed where feasible)</li>
+          <li>Roster extracts (SIS IDs, student/staff group designations)</li>
+        </ul>
+        <h3>Annex B — Residual Risk Examples</h3>
+        <ul class="list-tight">
+          <li>Public mirrors or caches not operated by ScriptNova</li>
+          <li>Personal devices off the Requester’s network</li>
+          <li>Users employing non-organizational accounts beyond Requester’s control</li>
+        </ul>
+        <h3>Annex C — Verification Examples</h3>
+        <ul class="list-tight">
+          <li>Confirmation link sent to an address at the asserted domain</li>
+          <li>Temporary DNS TXT record matching a code supplied by ScriptNova</li>
+          <li>Signed letter on official letterhead naming the signatory and scope</li>
+        </ul>
+        <!-- END LONG-FORM AGREEMENT -->
 
         <div class="hr"></div>
 
@@ -192,14 +268,20 @@
           </thead>
           <tbody id="approvedTbody">
             <tr>
-              <td><span class="mono">[Redacted Name #1]</span> <span class="badge">Default opt-out</span></td>
+              <td><span class="mono">Short Pump Middle School</span> <span class="badge">Default opt-out</span></td>
               <td>Approved</td>
               <td>Admin <strong>David Y</strong></td>
               <td><span id="approvedDate"></span></td>
             </tr>
+            <tr>
+              <td><span class="mono">Godwin High School</span> <span class="badge pending">Pending</span></td>
+              <td>Under Review</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
           </tbody>
         </table>
-        <p class="note">For privacy, public entries may display a redacted name unless the Requester consents to full disclosure. Additional approved entries appear as they are processed.</p>
+        <p class="note">Entries may be redacted for privacy unless disclosure is authorized. Status updates are reflected after review.</p>
       </aside>
     </div>
 
@@ -209,6 +291,7 @@
       <h2>Submit Organization/School Opt-Out Request</h2>
       <p class="muted small">Complete all required fields. Submissions are verified before enforcement. False or unauthorized submissions may be rejected.</p>
 
+      <!-- FORM KEPT THE SAME -->
       <form id="optoutForm" novalidate>
         <!-- Honeypot -->
         <div class="hidden">
