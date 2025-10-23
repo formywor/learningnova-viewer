@@ -19,6 +19,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         #language {
             padding: 5px;
@@ -27,7 +28,7 @@
             border: none;
             border-radius: 3px;
         }
-        #run-btn {
+        #run-btn, #analyze-btn {
             padding: 5px 10px;
             background: #007acc;
             color: white;
@@ -35,8 +36,19 @@
             border-radius: 3px;
             cursor: pointer;
         }
-        #run-btn:hover {
+        #run-btn:hover, #analyze-btn:hover {
             background: #005a9e;
+        }
+        #api-key {
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            background: #555;
+            color: white;
+            min-width: 200px;
+        }
+        #api-key::placeholder {
+            color: #aaa;
         }
         #container {
             display: flex;
@@ -71,6 +83,19 @@
             color: #c62828;
             font-family: monospace;
         }
+        #suggestions {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 3px;
+        }
+        #suggestions h4 {
+            margin-top: 0;
+        }
+        #suggestions p {
+            margin: 5px 0;
+        }
         #status {
             font-size: 12px;
             color: #666;
@@ -93,6 +118,9 @@
             <option value="lua">Lua</option>
         </select>
         <button id="run-btn">Run</button>
+        <label for="api-key">OpenAI Key:</label>
+        <input type="password" id="api-key" placeholder="sk-...">
+        <button id="analyze-btn">Analyze</button>
         <div id="status">Loading...</div>
     </div>
     <div id="container">
@@ -102,6 +130,7 @@
             <div id="preview"></div>
             <div id="output"></div>
             <div id="errors"></div>
+            <div id="suggestions"></div>
         </div>
     </div>
 
@@ -111,16 +140,17 @@
         let luaEngine;
         let currentOutput = '';
         let currentErrors = '';
+        let fixes = {};
 
         async function initPyodide() {
             try {
                 pyodide = await loadPyodide({
                     indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.0/full/"
                 });
-                document.getElementById('status').textContent = 'Pyodide loaded';
+                updateStatus('Pyodide loaded');
             } catch (err) {
                 console.error('Pyodide load error:', err);
-                document.getElementById('status').textContent = 'Pyodide failed: ' + err.message;
+                updateStatus('Pyodide failed: ' + err.message);
             }
         }
 
@@ -142,11 +172,17 @@
                     currentOutput += out + '\n';
                     return 0;
                 });
-                document.getElementById('status').textContent += ' | Lua loaded';
+                updateStatus(' | Lua loaded');
             } catch (err) {
                 console.error('Lua load error:', err);
-                document.getElementById('status').textContent += ' | Lua failed';
+                updateStatus(' | Lua failed');
             }
+        }
+
+        function updateStatus(text) {
+            const statusEl = document.getElementById('status');
+            const current = statusEl.textContent;
+            statusEl.textContent = current ? current + text : text;
         }
 
         function initEditor() {
@@ -155,12 +191,11 @@
                 require(['vs/editor/editor.main'], function () {
                     try {
                         // Register languages if needed
-                        if (!monaco.languages.getLanguages().find(l => l.id === 'lua')) {
-                            monaco.languages.register({ id: 'lua' });
-                        }
-                        if (!monaco.languages.getLanguages().find(l => l.id === 'python')) {
-                            monaco.languages.register({ id: 'python' });
-                        }
+                        ['html', 'python', 'lua'].forEach(langId => {
+                            if (!monaco.languages.getLanguages().find(l => l.id === langId)) {
+                                monaco.languages.register({ id: langId });
+                            }
+                        });
 
                         // Basic completions for Python
                         monaco.languages.registerCompletionItemProvider('python', {
@@ -213,7 +248,54 @@
                             wordWrap: 'on'
                         });
 
-                        document.getElementById('status').textContent = 'Ready';
+                        // Register Code Action Provider for all supported languages
+                        ['python', 'lua', 'html'].forEach(langId => {
+                            monaco.languages.registerCodeActionProvider(langId, {
+                                provideCodeActions: function(model, range, context, token) {
+                                    if (context.markers.length === 0 || Object.keys(fixes).length === 0) {
+                                        return { actions: [], dispose: () => {} };
+                                    }
+                                    const marker = context.markers.find(m => 
+                                        m.severity === monaco.MarkerSeverity.Error || 
+                                        m.severity === monaco.MarkerSeverity.Warning
+                                    );
+                                    if (!marker) {
+                                        return { actions: [], dispose: () => {} };
+                                    }
+                                    const line = marker.startLineNumber;
+                                    const fixObj = fixes[line];
+                                    if (!fixObj) {
+                                        return { actions: [], dispose: () => {} };
+                                    }
+                                    const lineLength = model.getLineLength(line);
+                                    return {
+                                        actions: [{
+                                            title: `AI Fix: ${marker.message.substring(0, 30)}...`,
+                                            diagnostics: context.markers,
+                                            edit: {
+                                                edits: [{
+                                                    resource: model.uri,
+                                                    versionId: model.getVersionId(),
+                                                    textChanges: [{
+                                                        range: {
+                                                            startLineNumber: line,
+                                                            startColumn: 1,
+                                                            endLineNumber: line,
+                                                            endColumn: lineLength + 1
+                                                        },
+                                                        text: fixObj.fix
+                                                    }]
+                                                }]
+                                            },
+                                            kind: monaco.languages.CodeActionKind.QuickFix
+                                        }],
+                                        dispose: () => {}
+                                    };
+                                }
+                            });
+                        });
+
+                        updateStatus(' | Editor ready');
                         resolve();
                     } catch (err) {
                         console.error('Editor init error:', err);
@@ -221,6 +303,106 @@
                     }
                 }, reject); // Error callback for require
             });
+        }
+
+        async function analyzeCode() {
+            const keyEl = document.getElementById('api-key');
+            let key = keyEl.value.replace(/,/g, '').trim();
+            if (!key) {
+                alert('Please enter your OpenAI API key (sk-...).');
+                return;
+            }
+            const code = editor.getValue();
+            const lang = document.getElementById('language').value;
+            if (!code.trim()) {
+                alert('No code to analyze.');
+                return;
+            }
+            updateStatus(' | Analyzing...');
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${key}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `You are an expert code linter and fixer for ${lang}. Analyze the code for syntax errors, logical bugs, style issues, and suggest improvements. Output ONLY valid JSON object with:
+
+{
+  "errors": [
+    {
+      "line": 1-based line number (integer),
+      "message": brief description (string),
+      "severity": "error" or "warning",
+      "fix": the replacement text for the entire line (string)
+    }
+  ],
+  "suggestions": [
+    {
+      "message": description (string),
+      "fix": optional full corrected code (string)
+    }
+  ]
+}
+
+Do not include any other text or explanation.`
+                            },
+                            { role: 'user', content: `Language: ${lang}\n\nCode:\n${code}` }
+                        ],
+                        temperature: 0.1,
+                        max_tokens: 2000
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API error: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const data = await response.json();
+                const content = data.choices[0].message.content.trim();
+                const analysis = JSON.parse(content);
+
+                // Set markers
+                const markers = analysis.errors.map(err => ({
+                    severity: err.severity === 'error' ? monaco.MarkerSeverity.Error : monaco.MarkerSeverity.Warning,
+                    message: err.message,
+                    startLineNumber: err.line,
+                    startColumn: 1,
+                    endLineNumber: err.line,
+                    endColumn: 100 // Approximate for underline
+                }));
+                monaco.editor.setModelMarkers(editor.getModel(), 'ai-linter', markers);
+
+                // Store fixes (whole line)
+                fixes = {};
+                analysis.errors.forEach(err => {
+                    fixes[err.line] = { fix: err.fix };
+                });
+
+                // Display suggestions
+                const suggDiv = document.getElementById('suggestions');
+                let suggHtml = '<h4>Suggestions:</h4>';
+                if (analysis.suggestions.length === 0) {
+                    suggHtml += '<p>No suggestions.</p>';
+                } else {
+                    suggHtml += analysis.suggestions.map(s => 
+                        `<p><strong>${s.message}</strong>${s.fix ? `<br><em>Fix:</em> ${s.fix}` : ''}</p>`
+                    ).join('');
+                }
+                suggDiv.innerHTML = suggHtml;
+
+                updateStatus(` | Analyzed: ${analysis.errors.length} errors, ${analysis.suggestions.length} suggestions`);
+            } catch (err) {
+                console.error(err);
+                alert('Analysis failed: ' + err.message);
+                updateStatus(' | Analysis failed');
+            }
         }
 
         async function runCode() {
@@ -257,7 +439,7 @@
                         });
                     } else if (lang === 'lua') {
                         if (!luaEngine) throw new Error('Lua not loaded');
-                        luaEngine.doString(code); // Sync, no await needed
+                        luaEngine.doString(code); // Sync
                     }
                     outputDiv.innerHTML = currentOutput || 'No output.';
                     if (currentErrors) {
@@ -278,27 +460,27 @@
             if (editor) {
                 editor.setValue(initialCode);
                 monaco.editor.setModelLanguage(editor.getModel(), lang);
+                // Clear analysis
+                monaco.editor.setModelMarkers(editor.getModel(), 'ai-linter', []);
+                fixes = {};
+                document.getElementById('suggestions').innerHTML = '';
             }
         });
 
         document.getElementById('run-btn').addEventListener('click', runCode);
-
-        // Auto-run for HTML after init
-        window.addEventListener('load', () => {
-            // But better handled in start
-        });
+        document.getElementById('analyze-btn').addEventListener('click', analyzeCode);
 
         // Start initialization
         async function start() {
             document.getElementById('status').textContent = 'Initializing...';
+            fixes = {};
             try {
-                await initPyodide();
-                await initLua();
+                await Promise.all([initPyodide(), initLua()]);
                 await initEditor();
                 // Now run initial code
                 runCode();
             } catch (err) {
-                document.getElementById('status').textContent = 'Init failed: ' + err.message;
+                updateStatus(' | Init failed: ' + err.message);
                 console.error('Start error:', err);
             }
         }
