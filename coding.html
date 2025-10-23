@@ -28,7 +28,7 @@
             border: none;
             border-radius: 3px;
         }
-        #run-btn, #analyze-btn {
+        #run-btn, #analyze-btn, #save-btn, #load-btn, #theme-btn {
             padding: 5px 10px;
             background: #007acc;
             color: white;
@@ -36,8 +36,11 @@
             border-radius: 3px;
             cursor: pointer;
         }
-        #run-btn:hover, #analyze-btn:hover {
+        #run-btn:hover, #analyze-btn:hover, #save-btn:hover, #load-btn:hover, #theme-btn:hover {
             background: #005a9e;
+        }
+        #file-input {
+            display: none;
         }
         #container {
             display: flex;
@@ -82,13 +85,54 @@
         #suggestions h4 {
             margin-top: 0;
         }
-        #suggestions p {
+        .suggestion-item {
+            border: 1px solid #ddd;
+            padding: 10px;
             margin: 5px 0;
+            border-radius: 3px;
+            position: relative;
+        }
+        .suggestion-item.error {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        .suggestion-item.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .suggestion-item.info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+        }
+        .accept-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 2px 6px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .suggestion-item:hover .accept-btn {
+            opacity: 1;
+        }
+        .accept-btn:hover {
+            background: #218838;
         }
         #status {
             font-size: 12px;
             color: #666;
             margin-left: auto;
+        }
+        #stats {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
         }
     </style>
     <!-- Monaco Editor - Updated to latest version -->
@@ -108,7 +152,12 @@
         </select>
         <button id="run-btn">Run</button>
         <button id="analyze-btn">Analyze</button>
+        <button id="save-btn">Save</button>
+        <label for="file-input" id="load-btn" style="cursor: pointer; padding: 5px 10px; background: #007acc; color: white; border-radius: 3px;">Load</label>
+        <input type="file" id="file-input" accept=".txt,.html,.py,.lua">
+        <button id="theme-btn">Toggle Theme</button>
         <div id="status">Loading...</div>
+        <div id="stats"></div>
     </div>
     <div id="container">
         <div id="editor-container"></div>
@@ -128,6 +177,7 @@
         let currentOutput = '';
         let currentErrors = '';
         let fixes = {};
+        let currentTheme = 'vs-dark';
 
         // HARDCODED OPENAI API KEY - REPLACE WITH YOUR OWN 'sk-...' KEY HERE
         // WARNING: This is visible in the page source! Anyone can see and use it. For production, use a backend proxy.
@@ -174,6 +224,15 @@
             const statusEl = document.getElementById('status');
             const current = statusEl.textContent;
             statusEl.textContent = current ? current + text : text;
+        }
+
+        function updateStats() {
+            if (!editor) return;
+            const model = editor.getModel();
+            const value = model.getValue();
+            const lines = value.split('\n').length;
+            const chars = value.length;
+            document.getElementById('stats').textContent = `${lines} lines | ${chars} chars`;
         }
 
         function initEditor() {
@@ -231,13 +290,16 @@
                         editor = monaco.editor.create(document.getElementById('editor-container'), {
                             value: '<h1>Hello World!</h1>',
                             language: 'html',
-                            theme: 'vs-dark',
+                            theme: currentTheme,
                             automaticLayout: true,
                             lineNumbers: 'on',
                             minimap: { enabled: false },
                             scrollBeyondLastLine: false,
                             wordWrap: 'on'
                         });
+
+                        // Event listener for stats update
+                        editor.onDidChangeModelContent(updateStats);
 
                         // Register Code Action Provider for all supported languages
                         ['python', 'lua', 'html'].forEach(langId => {
@@ -286,6 +348,18 @@
                             });
                         });
 
+                        // Load saved code if exists
+                        const saved = localStorage.getItem('savedCode');
+                        const savedLang = localStorage.getItem('savedLang');
+                        if (saved) {
+                            editor.setValue(saved);
+                            if (savedLang) {
+                                document.getElementById('language').value = savedLang;
+                                monaco.editor.setModelLanguage(editor.getModel(), savedLang);
+                            }
+                        }
+                        updateStats();
+
                         updateStatus(' | Editor ready');
                         resolve();
                     } catch (err) {
@@ -312,7 +386,7 @@
                 alert('No code to analyze.');
                 return;
             }
-            updateStatus(' | Analyzing...');
+            updateStatus(' | Analyzing deeply...');
             try {
                 const response = await fetch('https://api.openai.com/v1/chat/completions', {
                     method: 'POST',
@@ -325,31 +399,34 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `You are an expert code linter and fixer for ${lang}. Analyze the code for syntax errors, logical bugs, style issues, and suggest improvements. Output ONLY valid JSON object with:
+                                content: `You are an expert code reviewer for ${lang}. Perform a DEEP analysis: Check syntax errors, logical bugs, edge cases, performance bottlenecks, security vulnerabilities (e.g., injections, leaks), adherence to best practices (PEP8 for Python, semantic HTML, Lua idioms), code style/readability, scalability, and optimizations. Suggest refactoring for clarity/efficiency.
+
+Output ONLY valid JSON object with:
 
 {
   "errors": [
     {
       "line": 1-based line number (integer),
       "message": brief description (string),
-      "severity": "error" or "warning",
+      "severity": "error" | "warning" | "info",
       "fix": the replacement text for the entire line (string)
     }
   ],
   "suggestions": [
     {
-      "message": description (string),
-      "fix": optional full corrected code (string)
+      "message": detailed description (string),
+      "severity": "info",
+      "fix": optional full corrected code or snippet (string)
     }
   ]
 }
 
-Do not include any other text or explanation.`
+Be thorough: Cover structure, variables, functions, loops, conditions, I/O, and potential runtime issues. Do not include any other text.`
                             },
                             { role: 'user', content: `Language: ${lang}\n\nCode:\n${code}` }
                         ],
                         temperature: 0.1,
-                        max_tokens: 2000
+                        max_tokens: 3000 // Increased for deeper analysis
                     })
                 });
 
@@ -362,9 +439,10 @@ Do not include any other text or explanation.`
                 const content = data.choices[0].message.content.trim();
                 const analysis = JSON.parse(content);
 
-                // Set markers
-                const markers = analysis.errors.map(err => ({
-                    severity: err.severity === 'error' ? monaco.MarkerSeverity.Error : monaco.MarkerSeverity.Warning,
+                // Set markers for errors/warnings
+                const markers = analysis.errors.filter(e => e.severity !== 'info').map(err => ({
+                    severity: err.severity === 'error' ? monaco.MarkerSeverity.Error : 
+                              err.severity === 'warning' ? monaco.MarkerSeverity.Warning : monaco.MarkerSeverity.Info,
                     message: err.message,
                     startLineNumber: err.line,
                     startColumn: 1,
@@ -379,23 +457,62 @@ Do not include any other text or explanation.`
                     fixes[err.line] = { fix: err.fix };
                 });
 
-                // Display suggestions
+                // Display all items (errors + suggestions) with hover buttons
+                const allItems = [...analysis.errors, ...analysis.suggestions];
                 const suggDiv = document.getElementById('suggestions');
-                let suggHtml = '<h4>Suggestions:</h4>';
-                if (analysis.suggestions.length === 0) {
-                    suggHtml += '<p>No suggestions.</p>';
+                let suggHtml = '<h4>Analysis Results:</h4>';
+                if (allItems.length === 0) {
+                    suggHtml += '<p>No issues found. Great code!</p>';
                 } else {
-                    suggHtml += analysis.suggestions.map(s => 
-                        `<p><strong>${s.message}</strong>${s.fix ? `<br><em>Fix:</em> ${s.fix}` : ''}</p>`
-                    ).join('');
+                    suggHtml += allItems.map(item => {
+                        const className = item.severity === 'error' ? 'error' : 
+                                          item.severity === 'warning' ? 'warning' : 'info';
+                        const btnText = item.fix ? 'Accept Fix' : 'Dismiss';
+                        const btnAction = item.fix ? 
+                            (item.line ? `applyLineFix(${item.line})` : `applyFullFix('${item.fix.replace(/'/g, "\\'")}')`) : 
+                            'this.parentElement.remove()';
+                        return `
+                            <div class="suggestion-item ${className}">
+                                <h5>${item.severity.toUpperCase()}: ${item.message}</h5>
+                                ${item.line ? `<p>Line: ${item.line}</p>` : ''}
+                                ${item.fix ? `<p><em>Suggested Fix:</em> ${item.fix}</p>` : ''}
+                                <button class="accept-btn" onclick="${btnAction}">${btnText}</button>
+                            </div>
+                        `;
+                    }).join('');
                 }
                 suggDiv.innerHTML = suggHtml;
 
-                updateStatus(` | Analyzed: ${analysis.errors.length} errors, ${analysis.suggestions.length} suggestions`);
+                updateStatus(` | Deep analysis: ${analysis.errors.length} issues, ${analysis.suggestions.length} suggestions`);
             } catch (err) {
                 console.error(err);
-                alert('Analysis failed: ' + err.message);
+                alert('Deep analysis failed: ' + err.message);
                 updateStatus(' | Analysis failed');
+            }
+        }
+
+        function applyLineFix(line) {
+            if (fixes[line]) {
+                const model = editor.getModel();
+                const lineLength = model.getLineLength(line);
+                model.applyEdits([{
+                    range: {
+                        startLineNumber: line,
+                        startColumn: 1,
+                        endLineNumber: line,
+                        endColumn: lineLength + 1
+                    },
+                    text: fixes[line].fix
+                }]);
+                // Re-analyze after fix? Optional, but for now just update
+                updateStats();
+            }
+        }
+
+        function applyFullFix(fixCode) {
+            if (confirm('This will replace your entire code. Continue?')) {
+                editor.setValue(fixCode);
+                updateStats();
             }
         }
 
@@ -445,6 +562,31 @@ Do not include any other text or explanation.`
             }
         }
 
+        function saveCode() {
+            const code = editor.getValue();
+            const lang = document.getElementById('language').value;
+            localStorage.setItem('savedCode', code);
+            localStorage.setItem('savedLang', lang);
+            alert('Code saved to browser storage!');
+        }
+
+        function loadCode(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    editor.setValue(e.target.result);
+                    updateStats();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'vs-dark' ? 'vs-light' : 'vs-dark';
+            monaco.editor.setTheme(editor, currentTheme);
+        }
+
         // Event listeners
         document.getElementById('language').addEventListener('change', (e) => {
             const lang = e.target.value;
@@ -459,10 +601,17 @@ Do not include any other text or explanation.`
                 fixes = {};
                 document.getElementById('suggestions').innerHTML = '';
             }
+            updateStats();
         });
 
         document.getElementById('run-btn').addEventListener('click', runCode);
         document.getElementById('analyze-btn').addEventListener('click', analyzeCode);
+        document.getElementById('save-btn').addEventListener('click', saveCode);
+        document.getElementById('file-input').addEventListener('change', loadCode);
+        document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+
+        // Auto-save every 30 seconds
+        setInterval(saveCode, 30000);
 
         // Start initialization
         async function start() {
