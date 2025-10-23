@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Math Notebook</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 50px;
+            background-color: #f9f9f9;
+        }
+        .cell {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .cell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .add-cell {
+            background-color: #28a745;
+            margin-top: 10px;
+        }
+        .add-cell:hover {
+            background-color: #218838;
+        }
+        .delete-cell {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .delete-cell:hover {
+            background-color: #c82333;
+        }
+        #math-output {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Online Math Notebook</h1>
+        <p>This is a simple online math notebook powered by Math.js. Enter math expressions in the cells below. It supports evaluation, simplification, fractions (e.g., 1/2), exponents (e.g., 2^3), division, and much more. Use LaTeX-like syntax for display.</p>
+        
+        <div id="notebook">
+            <!-- Cells will be added here -->
+        </div>
+        
+        <button class="add-cell" onclick="addCell()">+ Add New Cell</button>
+    </div>
+
+    <script>
+        let cellCounter = 0;
+
+        function addCell() {
+            cellCounter++;
+            const notebook = document.getElementById('notebook');
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.id = `cell-${cellCounter}`;
+            cell.innerHTML = `
+                <div class="cell-header">
+                    <h3>Cell ${cellCounter}</h3>
+                    <button class="delete-cell" onclick="deleteCell('cell-${cellCounter}')">Delete</button>
+                </div>
+                <textarea placeholder="Enter math expression, e.g., (2 + 3) * 4^2 or simplify( (x^2 + 2x + 1)/(x+1) )"></textarea>
+                <br>
+                <button onclick="evaluateCell('cell-${cellCounter}')">Evaluate</button>
+                <button onclick="simplifyCell('cell-${cellCounter}')">Simplify</button>
+                <div id="math-output-${cellCounter}"></div>
+            `;
+            notebook.appendChild(cell);
+        }
+
+        function deleteCell(cellId) {
+            const cell = document.getElementById(cellId);
+            if (cell) {
+                cell.remove();
+            }
+        }
+
+        function evaluateCell(cellId) {
+            const cell = document.getElementById(cellId);
+            const textarea = cell.querySelector('textarea');
+            const output = document.getElementById(`math-output-${cellId.split('-')[1]}`);
+            const expr = textarea.value.trim();
+            if (!expr) return;
+
+            try {
+                // Check if it's a simplify command
+                if (expr.toLowerCase().startsWith('simplify(')) {
+                    output.innerHTML = `<div id="temp-output"></div>`;
+                    const simplified = math.simplify(expr.slice(9, -1)).toTex();
+                    MathJax.typesetPromise([output]).then(() => {
+                        output.innerHTML = `\\(${simplified}\\)`;
+                        MathJax.typesetPromise([output]);
+                    });
+                } else {
+                    const result = math.evaluate(expr);
+                    output.innerHTML = `<div id="temp-output"></div>`;
+                    const tex = math.format(result, { notation: 'fixed' });
+                    output.innerHTML = `\\(${tex}\\)`;
+                    MathJax.typesetPromise([output]);
+                }
+            } catch (error) {
+                output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function simplifyCell(cellId) {
+            const cell = document.getElementById(cellId);
+            const textarea = cell.querySelector('textarea');
+            const expr = textarea.value.trim();
+            if (!expr) return;
+
+            const output = document.getElementById(`math-output-${cellId.split('-')[1]}`);
+            try {
+                const simplified = math.simplify(expr).toTex();
+                output.innerHTML = `\\(${simplified}\\)`;
+                MathJax.typesetPromise([output]);
+            } catch (error) {
+                output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Add initial cell
+        addCell();
+    </script>
+</body>
+</html>
