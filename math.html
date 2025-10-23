@@ -3,102 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Math Notebook</title>
+    <title>Advanced Online Math Notebook</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f0f2f5;
+            cursor: crosshair; /* Custom cursor: crosshair for math feel */
         }
         .container {
             background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        textarea {
-            width: 100%;
-            height: 100px;
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: monospace;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #output {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            min-height: 50px;
-            background-color: #f9f9f9;
+            background: #e9ecef;
+            border-radius: 8px;
         }
         .cell {
             margin-bottom: 20px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: box-shadow 0.3s ease;
+        }
+        .cell:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .cell-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
         }
-        .add-cell {
-            background-color: #28a745;
-            margin-top: 10px;
+        .cell-type-selector {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
         }
-        .add-cell:hover {
-            background-color: #218838;
+        .input-area {
+            padding: 15px;
+            background: #fff;
         }
-        .delete-cell {
-            background-color: #dc3545;
-            padding: 5px 10px;
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .output-area {
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            min-height: 40px;
+            display: none;
+        }
+        .output-area.show {
+            display: block;
+        }
+        .output-area.markdown {
+            border-top: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
             font-size: 12px;
+            margin: 2px;
+            transition: background-color 0.2s;
         }
-        .delete-cell:hover {
-            background-color: #c82333;
+        button:hover {
+            background-color: #0056b3;
         }
-        #math-output {
-            font-size: 18px;
+        .add-cell { background-color: #28a745; }
+        .add-cell:hover { background-color: #218838; }
+        .delete-cell { background-color: #dc3545; font-size: 11px; padding: 5px 8px; }
+        .delete-cell:hover { background-color: #c82333; }
+        .run-cell { background-color: #17a2b8; }
+        .run-cell:hover { background-color: #138496; }
+        .run-all { background-color: #6f42c1; }
+        .run-all:hover { background-color: #5a32a3; }
+        #math-output, .plot-output {
+            font-size: 16px;
             margin-top: 10px;
+        }
+        .math-keyboard {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+        }
+        .math-keyboard.show {
+            display: block;
+        }
+        .keyboard-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 5px;
+        }
+        .kb-btn {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            padding: 5px 8px;
+            border-radius: 3px;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 30px;
+        }
+        .kb-btn:hover {
+            background: #dee2e6;
+        }
+        .toggle-kb {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .toggle-kb:hover {
+            background-color: #e0a800;
+        }
+        .theme-selector {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        .save-load {
+            display: flex;
+            gap: 10px;
+        }
+        #notebook-save {
+            display: none;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        /* Dark theme */
+        body.dark-theme {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+        body.dark-theme .container {
+            background: #495057;
+        }
+        body.dark-theme .cell {
+            border-color: #6c757d;
+        }
+        body.dark-theme .cell-header {
+            background: #6c757d;
+        }
+        body.dark-theme .input-area {
+            background: #495057;
+        }
+        body.dark-theme textarea {
+            background: #495057;
+            color: #f8f9fa;
+            border-color: #6c757d;
+        }
+        body.dark-theme .output-area {
+            background: #6c757d;
+        }
+        body.dark-theme .math-keyboard {
+            background: #495057;
+            border-color: #6c757d;
+        }
+        body.dark-theme .kb-btn {
+            background: #6c757d;
+            color: #f8f9fa;
+            border-color: #dee2e6;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Online Math Notebook</h1>
-        <p>This is a simple online math notebook powered by Math.js. Enter math expressions in the cells below. It supports evaluation, simplification, fractions (e.g., 1/2), exponents (e.g., 2^3), division, and much more. Use LaTeX-like syntax for display.</p>
+        <h1>Advanced Online Math Notebook</h1>
+        <p>A full-featured math notebook with cell types, plotting, variables, themes, save/load, and a math keyboard. Use Shift+Enter to run cells. Supports evaluation, simplification, markdown, and plots (e.g., plot(sin(x))).</p>
+        
+        <div class="toolbar">
+            <div>
+                <button class="add-cell" onclick="addCell()">+ Add Cell</button>
+                <button class="run-all" onclick="runAllCells()">Run All</button>
+            </div>
+            <div class="save-load">
+                <input type="file" id="notebook-load" accept=".json" style="display:none;" onchange="loadNotebook(event)">
+                <button onclick="document.getElementById('notebook-load').click()">Load</button>
+                <button onclick="saveNotebook()">Save</button>
+            </div>
+            <div>
+                <select class="theme-selector" onchange="changeTheme(this.value)">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+                <button class="toggle-kb" onclick="toggleKeyboard()">Math Keyboard</button>
+            </div>
+        </div>
         
         <div id="notebook">
             <!-- Cells will be added here -->
         </div>
-        
-        <button class="add-cell" onclick="addCell()">+ Add New Cell</button>
+    </div>
+
+    <div class="math-keyboard" id="math-keyboard">
+        <div class="keyboard-row">
+            <button class="kb-btn" onclick="insertSymbol('(')">(</button>
+            <button class="kb-btn" onclick="insertSymbol(')')">)</button>
+            <button class="kb-btn" onclick="insertSymbol('+')">+</button>
+            <button class="kb-btn" onclick="insertSymbol('-')">-</button>
+            <button class="kb-btn" onclick="insertSymbol('*')">*</button>
+            <button class="kb-btn" onclick="insertSymbol('/')">/</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="kb-btn" onclick="insertSymbol('^') "^</button>
+            <button class="kb-btn" onclick="insertSymbol('sqrt(')">√</button>
+            <button class="kb-btn" onclick="insertSymbol('pi')">π</button>
+            <button class="kb-btn" onclick="insertSymbol('e')">e</button>
+            <button class="kb-btn" onclick="insertSymbol('sin(')">sin</button>
+            <button class="kb-btn" onclick="insertSymbol('cos(')">cos</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="kb-btn" onclick="insertSymbol('tan(')">tan</button>
+            <button class="kb-btn" onclick="insertSymbol('log(')">log</button>
+            <button class="kb-btn" onclick="insertSymbol('exp(')">exp</button>
+            <button class="kb-btn" onclick="insertSymbol('1/')">1/</button>
+            <button class="kb-btn" onclick="insertSymbol('x^2')">x²</button>
+            <button class="kb-btn" onclick="insertSymbol('=')">=</button>
+        </div>
     </div>
 
     <script>
         let cellCounter = 0;
+        let activeCell = null;
+        let scope = {}; // For variables persistence
+        math.import({scope}, math);
 
-        function addCell() {
+        // Keyboard events for Shift+Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.shiftKey && e.key === 'Enter') {
+                e.preventDefault();
+                const textarea = document.querySelector('textarea:focus');
+                if (textarea) {
+                    const cellId = textarea.closest('.cell').id;
+                    runCell(cellId);
+                }
+            }
+        });
+
+        function addCell(type = 'math') {
             cellCounter++;
             const notebook = document.getElementById('notebook');
             const cell = document.createElement('div');
@@ -106,71 +298,200 @@
             cell.id = `cell-${cellCounter}`;
             cell.innerHTML = `
                 <div class="cell-header">
-                    <h3>Cell ${cellCounter}</h3>
-                    <button class="delete-cell" onclick="deleteCell('cell-${cellCounter}')">Delete</button>
+                    <select class="cell-type-selector" onchange="changeCellType('${cell.id}', this.value)">
+                        <option value="math" ${type === 'math' ? 'selected' : ''}>Math</option>
+                        <option value="markdown" ${type === 'markdown' ? 'selected' : ''}>Markdown</option>
+                    </select>
+                    <button class="run-cell" onclick="runCell('${cell.id}')">Run</button>
+                    <button class="delete-cell" onclick="deleteCell('${cell.id}')">Delete</button>
                 </div>
-                <textarea placeholder="Enter math expression, e.g., (2 + 3) * 4^2 or simplify( (x^2 + 2x + 1)/(x+1) )"></textarea>
-                <br>
-                <button onclick="evaluateCell('cell-${cellCounter}')">Evaluate</button>
-                <button onclick="simplifyCell('cell-${cellCounter}')">Simplify</button>
-                <div id="math-output-${cellCounter}"></div>
+                <div class="input-area">
+                    <textarea placeholder="${type === 'math' ? 'Enter math: 2+3, simplify(x^2), plot(sin(x))' : 'Enter markdown: # Title\n- List item'}"></textarea>
+                </div>
+                <div class="output-area" id="output-${cellCounter}"></div>
             `;
             notebook.appendChild(cell);
+            const textarea = cell.querySelector('textarea');
+            textarea.focus();
+            activeCell = cell;
         }
 
         function deleteCell(cellId) {
-            const cell = document.getElementById(cellId);
-            if (cell) {
-                cell.remove();
-            }
+            document.getElementById(cellId).remove();
         }
 
-        function evaluateCell(cellId) {
+        function changeCellType(cellId, type) {
             const cell = document.getElementById(cellId);
             const textarea = cell.querySelector('textarea');
-            const output = document.getElementById(`math-output-${cellId.split('-')[1]}`);
+            textarea.placeholder = type === 'math' ? 'Enter math: 2+3, simplify(x^2), plot(sin(x))' : 'Enter markdown: # Title\n- List item';
+            // Clear output
+            const output = document.getElementById(`output-${cellId.split('-')[1]}`);
+            output.innerHTML = '';
+            output.className = 'output-area';
+        }
+
+        async function runCell(cellId) {
+            const cell = document.getElementById(cellId);
+            const type = cell.querySelector('.cell-type-selector').value;
+            const textarea = cell.querySelector('textarea');
+            const output = document.getElementById(`output-${cellId.split('-')[1]}`);
             const expr = textarea.value.trim();
             if (!expr) return;
 
+            output.classList.add('show');
+            output.innerHTML = '<p>Running...</p>';
+
             try {
-                // Check if it's a simplify command
-                if (expr.toLowerCase().startsWith('simplify(')) {
-                    output.innerHTML = `<div id="temp-output"></div>`;
-                    const simplified = math.simplify(expr.slice(9, -1)).toTex();
-                    MathJax.typesetPromise([output]).then(() => {
-                        output.innerHTML = `\\(${simplified}\\)`;
-                        MathJax.typesetPromise([output]);
-                    });
+                if (type === 'math') {
+                    await processMath(expr, output);
                 } else {
-                    const result = math.evaluate(expr);
-                    output.innerHTML = `<div id="temp-output"></div>`;
-                    const tex = math.format(result, { notation: 'fixed' });
-                    output.innerHTML = `\\(${tex}\\)`;
+                    output.innerHTML = marked.parse(expr);
+                    output.classList.add('markdown');
                     MathJax.typesetPromise([output]);
                 }
+                output.classList.remove('error');
+                output.classList.add('success');
             } catch (error) {
-                output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                output.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                output.classList.add('error');
+                output.classList.remove('success');
             }
         }
 
-        function simplifyCell(cellId) {
-            const cell = document.getElementById(cellId);
-            const textarea = cell.querySelector('textarea');
-            const expr = textarea.value.trim();
-            if (!expr) return;
-
-            const output = document.getElementById(`math-output-${cellId.split('-')[1]}`);
-            try {
-                const simplified = math.simplify(expr).toTex();
+        async function processMath(expr, output) {
+            // Handle simplify
+            if (expr.toLowerCase().startsWith('simplify(')) {
+                const simplified = math.simplify(expr.slice(9, -1)).toTex();
                 output.innerHTML = `\\(${simplified}\\)`;
                 MathJax.typesetPromise([output]);
-            } catch (error) {
-                output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                return;
             }
+
+            // Handle plot
+            if (expr.toLowerCase().startsWith('plot(')) {
+                const plotData = parsePlot(expr);
+                const plotDiv = document.createElement('div');
+                plotDiv.id = `plot-${Date.now()}`;
+                output.appendChild(plotDiv);
+                Plotly.newPlot(plotDiv, plotData.traces, plotData.layout);
+                return;
+            }
+
+            // Evaluate
+            const result = math.evaluate(expr, scope);
+            const tex = math.format(result, { notation: 'fixed' });
+            output.innerHTML = `\\(${tex}\\)`;
+            MathJax.typesetPromise([output]);
         }
 
-        // Add initial cell
-        addCell();
+        function parsePlot(expr) {
+            // Simple plot parser: plot(sin(x), {x: -10 to 10})
+            const match = expr.match(/plot\(([^,]+)(,\s*\{([^}]+)\})?\)/i);
+            if (!match) throw new Error('Invalid plot syntax');
+            const funcStr = match[1].trim();
+            const rangeStr = match[3] ? match[3].match(/x:\s*(-?\d+)\s+to\s*(-?\d+)/i) : null;
+            const xMin = rangeStr ? parseFloat(rangeStr[1]) : -10;
+            const xMax = rangeStr ? parseFloat(rangeStr[2]) : 10;
+
+            const x = [];
+            const y = [];
+            for (let i = xMin; i <= xMax; i += 0.1) {
+                x.push(i);
+                y.push(math.evaluate(funcStr.replace('x', i), scope));
+            }
+
+            return {
+                traces: [{ x, y, type: 'scatter', mode: 'lines' }],
+                layout: { title: `Plot of ${funcStr}`, xaxis: { title: 'x' }, yaxis: { title: 'y' } }
+            };
+        }
+
+        function runAllCells() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                if (index > 0) setTimeout(() => runCell(cell.id), index * 500); // Staggered run
+            });
+        }
+
+        function saveNotebook() {
+            const cells = [];
+            document.querySelectorAll('.cell').forEach(cell => {
+                const type = cell.querySelector('.cell-type-selector').value;
+                const input = cell.querySelector('textarea').value;
+                const output = cell.querySelector('.output-area').innerHTML;
+                cells.push({ type, input, output });
+            });
+            const dataStr = JSON.stringify({ cells, scope }, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `notebook-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadNotebook(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    document.getElementById('notebook').innerHTML = '';
+                    cellCounter = 0;
+                    data.cells.forEach(cellData => {
+                        addCell(cellData.type);
+                        const lastCell = document.querySelector('.cell:last-child');
+                        lastCell.querySelector('textarea').value = cellData.input;
+                        const output = lastCell.querySelector('.output-area');
+                        output.innerHTML = cellData.output;
+                        output.classList.add('show');
+                    });
+                    Object.assign(scope, data.scope || {});
+                } catch (err) {
+                    alert('Error loading notebook: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function changeTheme(theme) {
+            document.body.className = theme + '-theme';
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            changeTheme('dark');
+            document.querySelector('.theme-selector').value = 'dark';
+        }
+
+        function toggleKeyboard() {
+            const kb = document.getElementById('math-keyboard');
+            kb.classList.toggle('show');
+        }
+
+        function insertSymbol(symbol) {
+            if (!activeCell) return;
+            const textarea = activeCell.querySelector('textarea');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            textarea.value = text.substring(0, start) + symbol + text.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + symbol.length;
+            textarea.focus();
+        }
+
+        // Set active cell on focus
+        document.addEventListener('focus', function(e) {
+            if (e.target.tagName === 'TEXTAREA') {
+                activeCell = e.target.closest('.cell');
+            }
+        }, true);
+
+        // Initial cell
+        addCell('math');
     </script>
 </body>
 </html>
