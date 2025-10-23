@@ -39,17 +39,6 @@
         #run-btn:hover, #analyze-btn:hover {
             background: #005a9e;
         }
-        #api-key {
-            padding: 5px;
-            border-radius: 3px;
-            border: 1px solid #555;
-            background: #555;
-            color: white;
-            min-width: 200px;
-        }
-        #api-key::placeholder {
-            color: #aaa;
-        }
         #container {
             display: flex;
             flex: 1;
@@ -118,8 +107,6 @@
             <option value="lua">Lua</option>
         </select>
         <button id="run-btn">Run</button>
-        <label for="api-key">OpenAI Key:</label>
-        <input type="password" id="api-key" placeholder="sk-...">
         <button id="analyze-btn">Analyze</button>
         <div id="status">Loading...</div>
     </div>
@@ -141,6 +128,10 @@
         let currentOutput = '';
         let currentErrors = '';
         let fixes = {};
+
+        // HARDCODED OPENAI API KEY - REPLACE WITH YOUR OWN 'sk-...' KEY HERE
+        // WARNING: This is visible in the page source! Anyone can see and use it. For production, use a backend proxy.
+        const API_KEY = 'sk-PLACEHOLDER_REPLACE_WITH_YOUR_KEY'; // e.g., 'sk-proj-abc123...'
 
         async function initPyodide() {
             try {
@@ -306,10 +297,13 @@
         }
 
         async function analyzeCode() {
-            const keyEl = document.getElementById('api-key');
-            let key = keyEl.value.replace(/,/g, '').trim();
-            if (!key) {
-                alert('Please enter your OpenAI API key (sk-...).');
+            if (API_KEY === 'sk-PLACEHOLDER_REPLACE_WITH_YOUR_KEY') {
+                alert('Please replace the API_KEY placeholder in the code with your actual OpenAI key (sk-...).');
+                return;
+            }
+            let key = API_KEY.replace(/,/g, '').trim(); // Ignore commas if any
+            if (!key.startsWith('sk-')) {
+                alert('Invalid API key format. Must start with "sk-".');
                 return;
             }
             const code = editor.getValue();
