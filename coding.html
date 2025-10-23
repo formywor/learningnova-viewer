@@ -74,14 +74,15 @@
         #status {
             font-size: 12px;
             color: #666;
+            margin-left: auto;
         }
     </style>
-    <!-- Monaco Editor -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
-    <!-- Pyodide for Python -->
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
-    <!-- Wasmoon for Lua -->
-    <script src="https://cdn.jsdelivr.net/npm/wasmoon@1.2.0/dist/wasmoon.js"></script>
+    <!-- Monaco Editor - Updated to latest version -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs/loader.min.js"></script>
+    <!-- Pyodide for Python - Updated to latest -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
+    <!-- Wasmoon for Lua - Updated to latest -->
+    <script src="https://cdn.jsdelivr.net/npm/wasmoon@1.16.0/dist/wasmoon.js"></script>
 </head>
 <body>
     <div id="toolbar">
@@ -112,78 +113,121 @@
         let currentErrors = '';
 
         async function initPyodide() {
-            pyodide = await loadPyodide({
-                indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.1/full/"
-            });
-            document.getElementById('status').textContent = 'Pyodide loaded';
+            try {
+                pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.0/full/"
+                });
+                document.getElementById('status').textContent = 'Pyodide loaded';
+            } catch (err) {
+                console.error('Pyodide load error:', err);
+                document.getElementById('status').textContent = 'Pyodide failed: ' + err.message;
+            }
         }
 
         async function initLua() {
-            const { LuaFactory } = window.wasmoon;
-            const factory = new LuaFactory();
-            luaEngine = await factory.createEngine();
-            // Override print for Lua
-            luaEngine.global.set('print', (...args) => {
-                let out = '';
-                for (let i = 0; i < args.length; i++) {
-                    if (i > 0) out += '\t';
-                    let arg = args[i];
-                    if (typeof arg === 'number') out += arg.toString();
-                    else if (typeof arg === 'string') out += arg;
-                    else out += JSON.stringify(arg);
-                }
-                currentOutput += out + '\n';
-                return 0;
-            });
-            document.getElementById('status').textContent = 'Lua loaded';
+            try {
+                const { LuaFactory } = window.wasmoon;
+                const factory = new LuaFactory();
+                luaEngine = await factory.createEngine();
+                // Override print for Lua
+                luaEngine.global.set('print', (...args) => {
+                    let out = '';
+                    for (let i = 0; i < args.length; i++) {
+                        if (i > 0) out += '\t';
+                        let arg = args[i];
+                        if (typeof arg === 'number') out += arg.toString();
+                        else if (typeof arg === 'string') out += arg;
+                        else out += JSON.stringify(arg);
+                    }
+                    currentOutput += out + '\n';
+                    return 0;
+                });
+                document.getElementById('status').textContent += ' | Lua loaded';
+            } catch (err) {
+                console.error('Lua load error:', err);
+                document.getElementById('status').textContent += ' | Lua failed';
+            }
         }
 
         function initEditor() {
-            require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
-            require(['vs/editor/editor.main'], async function () {
-                // Register languages if needed
-                if (!monaco.languages.getLanguages().find(l => l.id === 'lua')) {
-                    monaco.languages.register({ id: 'lua' });
-                }
-                if (!monaco.languages.getLanguages().find(l => l.id === 'python')) {
-                    monaco.languages.register({ id: 'python' });
-                }
+            return new Promise((resolve, reject) => {
+                require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs' } });
+                require(['vs/editor/editor.main'], function () {
+                    try {
+                        // Register languages if needed
+                        if (!monaco.languages.getLanguages().find(l => l.id === 'lua')) {
+                            monaco.languages.register({ id: 'lua' });
+                        }
+                        if (!monaco.languages.getLanguages().find(l => l.id === 'python')) {
+                            monaco.languages.register({ id: 'python' });
+                        }
 
-                // Basic completions
-                monaco.languages.registerCompletionItemProvider('python', {
-                    provideCompletionItems: () => ({
-                        suggestions: [
-                            { label: 'print', kind: monaco.languages.CompletionItemKind.Function, insertText: 'print($1)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet },
-                            { label: 'def', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'def ${1:function}($2):\n\t$0', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet }
-                        ]
-                    })
-                });
+                        // Basic completions for Python
+                        monaco.languages.registerCompletionItemProvider('python', {
+                            provideCompletionItems: () => ({
+                                suggestions: [
+                                    { 
+                                        label: 'print', 
+                                        kind: monaco.languages.CompletionItemKind.Function, 
+                                        insertText: 'print($1)', 
+                                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
+                                    },
+                                    { 
+                                        label: 'def', 
+                                        kind: monaco.languages.CompletionItemKind.Keyword, 
+                                        insertText: 'def ${1:function}($2):\n\t$0', 
+                                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
+                                    }
+                                ]
+                            })
+                        });
 
-                monaco.languages.registerCompletionItemProvider('lua', {
-                    provideCompletionItems: () => ({
-                        suggestions: [
-                            { label: 'print', kind: monaco.languages.CompletionItemKind.Function, insertText: 'print($1)', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet },
-                            { label: 'function', kind: monaco.languages.CompletionItemKind.Keyword, insertText: 'function ${1:name}($2)\n\t$0\nend', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet }
-                        ]
-                    })
-                });
+                        // Basic completions for Lua
+                        monaco.languages.registerCompletionItemProvider('lua', {
+                            provideCompletionItems: () => ({
+                                suggestions: [
+                                    { 
+                                        label: 'print', 
+                                        kind: monaco.languages.CompletionItemKind.Function, 
+                                        insertText: 'print($1)', 
+                                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
+                                    },
+                                    { 
+                                        label: 'function', 
+                                        kind: monaco.languages.CompletionItemKind.Keyword, 
+                                        insertText: 'function ${1:name}($2)\n\t$0\nend', 
+                                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
+                                    }
+                                ]
+                            })
+                        });
 
-                editor = monaco.editor.create(document.getElementById('editor-container'), {
-                    value: '<h1>Hello World!</h1>',
-                    language: 'html',
-                    theme: 'vs-dark',
-                    automaticLayout: true,
-                    lineNumbers: 'on',
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false
-                });
+                        editor = monaco.editor.create(document.getElementById('editor-container'), {
+                            value: '<h1>Hello World!</h1>',
+                            language: 'html',
+                            theme: 'vs-dark',
+                            automaticLayout: true,
+                            lineNumbers: 'on',
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
+                            wordWrap: 'on'
+                        });
 
-                document.getElementById('status').textContent = 'Editor ready';
+                        document.getElementById('status').textContent = 'Ready';
+                        resolve();
+                    } catch (err) {
+                        console.error('Editor init error:', err);
+                        reject(err);
+                    }
+                }, reject); // Error callback for require
             });
         }
 
         async function runCode() {
-            if (!editor) return;
+            if (!editor) {
+                console.warn('Editor not ready');
+                return;
+            }
             const code = editor.getValue();
             const lang = document.getElementById('language').value;
             const preview = document.getElementById('preview');
@@ -207,13 +251,13 @@
                 try {
                     if (lang === 'python') {
                         if (!pyodide) throw new Error('Pyodide not loaded');
-                        const result = await pyodide.runPythonAsync(code, {
+                        await pyodide.runPythonAsync(code, {
                             stdout: (text) => { currentOutput += text; },
                             stderr: (text) => { currentErrors += text; }
                         });
                     } else if (lang === 'lua') {
                         if (!luaEngine) throw new Error('Lua not loaded');
-                        await luaEngine.doString(code);
+                        luaEngine.doString(code); // Sync, no await needed
                     }
                     outputDiv.innerHTML = currentOutput || 'No output.';
                     if (currentErrors) {
@@ -239,25 +283,26 @@
 
         document.getElementById('run-btn').addEventListener('click', runCode);
 
-        // Auto-run on load for HTML
+        // Auto-run for HTML after init
         window.addEventListener('load', () => {
-            if (document.getElementById('language').value === 'html' && editor) {
-                runCode();
-            }
+            // But better handled in start
         });
 
         // Start initialization
         async function start() {
             document.getElementById('status').textContent = 'Initializing...';
-            await Promise.all([initPyodide(), initLua()]);
-            initEditor();
-            // Run initial after editor loads, but since async, set timeout or listen
-            setTimeout(runCode, 1000); // Simple delay for initial HTML
+            try {
+                await initPyodide();
+                await initLua();
+                await initEditor();
+                // Now run initial code
+                runCode();
+            } catch (err) {
+                document.getElementById('status').textContent = 'Init failed: ' + err.message;
+                console.error('Start error:', err);
+            }
         }
-        start().catch(err => {
-            document.getElementById('status').textContent = 'Error: ' + err.message;
-            console.error(err);
-        });
+        start();
     </script>
 </body>
 </html>
