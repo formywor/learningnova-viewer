@@ -1,3 +1,14 @@
 <!doctype html>
 <meta charset="utf-8"/>
-<script>location.replace("/");</script>
+<title>Redirecting…</title>
+<script>
+  // Preserve the path that GitHub Pages couldn't find
+  // e.g. /testsite123 → /?path=testsite123
+  (function () {
+    var path = location.pathname.replace(/^\/+/, ''); // remove leading slash
+    var qs = location.search ? '&' + location.search.slice(1) : '';
+    var hash = location.hash || '';
+    var target = '/?path=' + encodeURIComponent(path) + qs + hash;
+    location.replace(target);
+  })();
+</script>

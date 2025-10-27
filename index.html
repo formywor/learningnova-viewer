@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>LearningNova – Sites</title>
   <style>
-    body{margin:0;background:#0b1220;color:#eaf2ff;font-family:Inter,system-ui,Arial,sans-serif}
+    :root{--bg:#0b1220;--card:#121a2b;--ink:#eaf2ff;--muted:#a9b6c7;--accent:#7dd3fc}
+    body{margin:0;background:#0b1220;color:var(--ink);font-family:Inter,system-ui,Arial,sans-serif}
     header,nav,main{max-width:1000px;margin:auto;padding:12px}
-    a{color:#7dd3fc;text-decoration:none}
+    a{color:var(--accent);text-decoration:none}
     .pill{display:inline-block;padding:4px 10px;border:1px solid #2a3f65;border-radius:999px;background:#0e1a2e}
-    .muted{color:#a9b6c7}
+    .muted{color:var(--muted)}
     .card{background:#121a2b;border:1px solid #1b2a45;border-radius:14px;padding:14px}
     .nav a{margin-right:8px}
   </style>
@@ -26,6 +27,18 @@
 </main>
 
 <script type="module">
+  // --- SPA path restore (works with GitHub Pages 404 redirect) ---
+  (function restoreSpaPath() {
+    const usp = new URLSearchParams(window.location.search);
+    const preserved = usp.get('path'); // set by 404.html
+    if (preserved) {
+      const p = usp.get('p'); // keep supporting ?p=<slug>
+      const clean = '/' + preserved + (p ? ('?p=' + encodeURIComponent(p)) : '') + window.location.hash;
+      window.history.replaceState(null, '', clean);
+    }
+  })();
+
+  // Firebase + Firestore viewer
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
   import { firebaseConfig } from "./firebase-config.js";
@@ -33,46 +46,69 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const parts = location.pathname.replace(/^\/+/,'').split('/').filter(Boolean);
+  const $ = s => document.querySelector(s);
+
+  // Resolve /<sitename> and optional ?p=<slug>
+  const parts = location.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
   const sitename = parts[0] || "";
   const params = new URLSearchParams(location.search);
   const reqPage = params.get("p");
 
-  const $ = s => document.querySelector(s);
-  $("#sitePath").textContent = sitename ? "/"+sitename : "/";
+  $("#sitePath").textContent = sitename ? "/" + sitename : "/";
 
-  if (!sitename){
-    $("#content").innerHTML = `<h2>Welcome</h2><p class="muted">Visit <code>/&lt;sitename&gt;</code> for a published site.</p>`;
-  } else {
-    const ref = doc(db,"sites",sitename);
-    const snap = await getDoc(ref);
-    if (!snap.exists()){
-      $("#content").innerHTML = `<h2>Not found</h2><p class="muted">No such site.</p>`;
-    } else {
-      const site = snap.data();
-      document.title = (site.title || sitename) + " – LearningNova";
-      $("#pubBadge").textContent = site.published ? "published" : "unpublished";
-      if (!site.published){
-        $("#content").innerHTML = `<h2>Not published</h2><p class="muted">Owner hasn’t published yet.</p>`;
-      } else {
-        // Build nav
-        const slugs = Object.keys(site.pages || {});
-        const nav = $("#nav"); nav.innerHTML = "";
-        slugs.forEach(slug=>{
-          const a = document.createElement("a");
-          a.href = `/${sitename}?p=${encodeURIComponent(slug)}`;
-          a.textContent = site.pages[slug].title || slug;
-          if (slug === reqPage || (!reqPage && slug === slugs[0])) a.className = "pill";
-          nav.appendChild(a);
-        });
-        const current = reqPage || slugs[0];
-        const page = site.pages[current];
-        $("#content").innerHTML = page
-          ? (page.blocks||[]).map(b=>b.type==="text" ? b.html : "").join("\n")
-          : `<h2>Page not found</h2>`;
-      }
+  async function render() {
+    if (!sitename) {
+      $("#content").innerHTML = `<h2>Welcome</h2><p class="muted">Visit <code>/&lt;sitename&gt;</code> for a published site.</p>`;
+      return;
     }
+
+    const ref = doc(db, "sites", sitename);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      $("#pubBadge").textContent = "";
+      $("#content").innerHTML = `<h2>Not found</h2><p class="muted">No such site.</p>`;
+      return;
+    }
+
+    const site = snap.data();
+    document.title = (site.title || sitename) + " – LearningNova";
+    $("#pubBadge").textContent = site.published ? "published" : "unpublished";
+
+    if (!site.published) {
+      $("#content").innerHTML = `<h2>Not published</h2><p class="muted">The owner hasn’t published this site yet.</p>`;
+      return;
+    }
+
+    // Build nav
+    const nav = $("#nav");
+    nav.innerHTML = "";
+    const slugs = Object.keys(site.pages || {});
+    slugs.forEach(slug => {
+      const a = document.createElement("a");
+      a.href = `/${sitename}?p=${encodeURIComponent(slug)}`;
+      a.textContent = site.pages[slug].title || slug;
+      if (slug === reqPage || (!reqPage && slug === slugs[0])) a.className = "pill";
+      nav.appendChild(a);
+    });
+
+    // Render selected page
+    const current = reqPage || slugs[0];
+    const page = site.pages[current];
+    if (!page) {
+      $("#content").innerHTML = `<h2>Page not found</h2>`;
+      return;
+    }
+
+    const html = (page.blocks || [])
+      .filter(b => b.type === "text")
+      .map(b => b.html || "")
+      .join("\n");
+
+    $("#content").innerHTML = html || `<p class="muted">No content yet.</p>`;
   }
+
+  render();
 </script>
 </body>
 </html>
