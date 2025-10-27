@@ -8,11 +8,12 @@
     :root{--bg:#0b1220;--card:#121a2b;--ink:#eaf2ff;--muted:#a9b6c7;--accent:#7dd3fc}
     body{margin:0;background:#0b1220;color:var(--ink);font-family:Inter,system-ui,Arial,sans-serif}
     header,nav,main{max-width:1000px;margin:auto;padding:12px}
-    a{color:var(--accent);text-decoration:none}
+    a{color:var(--accent);text-decoration:none;cursor:pointer}
     .pill{display:inline-block;padding:4px 10px;border:1px solid #2a3f65;border-radius:999px;background:#0e1a2e}
     .muted{color:var(--muted)}
     .card{background:#121a2b;border:1px solid #1b2a45;border-radius:14px;padding:14px}
     .nav a{margin-right:8px}
+    .nav a.active{background:#0e1a2e;border-radius:999px;padding:4px 10px}
   </style>
 </head>
 <body>
@@ -27,18 +28,18 @@
 </main>
 
 <script type="module">
-  // --- SPA path restore (works with GitHub Pages 404 redirect) ---
+  // ---- GitHub Pages path restore (from 404.html → ?path=...) ----
   (function restoreSpaPath() {
     const usp = new URLSearchParams(window.location.search);
     const preserved = usp.get('path'); // set by 404.html
     if (preserved) {
-      const p = usp.get('p'); // keep supporting ?p=<slug>
+      const p = usp.get('p');
       const clean = '/' + preserved + (p ? ('?p=' + encodeURIComponent(p)) : '') + window.location.hash;
       window.history.replaceState(null, '', clean);
     }
   })();
 
-  // Firebase + Firestore viewer
+  // ---- Firebase ----
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
   import { firebaseConfig } from "./firebase-config.js";
@@ -47,65 +48,129 @@
   const db = getFirestore(app);
 
   const $ = s => document.querySelector(s);
+  const sitePathEl = $("#sitePath");
+  const pubBadge = $("#pubBadge");
+  const nav = $("#nav");
+  const content = $("#content");
 
-  // Resolve /<sitename> and optional ?p=<slug>
-  const parts = location.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
-  const sitename = parts[0] || "";
-  const params = new URLSearchParams(location.search);
-  const reqPage = params.get("p");
+  // ---- Router helpers ----
+  function parseRoute() {
+    const parts = location.pathname.replace(/^\/+/, "").split("/").filter(Boolean);
+    const sitename = parts[0] || "";
+    const params = new URLSearchParams(location.search);
+    const slug = params.get("p") || ""; // empty means default first page later
+    return { sitename, slug };
+  }
 
-  $("#sitePath").textContent = sitename ? "/" + sitename : "/";
+  function setRoute(sitename, slug, replace=false) {
+    const url = "/" + sitename + (slug ? ("?p=" + encodeURIComponent(slug)) : "");
+    (replace ? history.replaceState : history.pushState).call(history, null, "", url);
+    render(); // re-render without full reload
+  }
+
+  window.addEventListener("popstate", render); // back/forward support
+
+  // ---- Content link normalization (in-page links) ----
+  function normalizeInternalHref(href, sitename, knownSlugs) {
+    if (!href) return null;
+
+    // absolute external links: leave alone
+    if (/^[a-z]+:\/\//i.test(href) || href.startsWith("mailto:") || href.startsWith("tel:")) return null;
+
+    // "?p=slug"
+    const pMatch = href.match(/^\?p=([^#&]+)/);
+    if (pMatch) {
+      const slug = decodeURIComponent(pMatch[1]).toLowerCase();
+      return knownSlugs.has(slug) ? ("/" + sitename + "?p=" + encodeURIComponent(slug)) : null;
+    }
+
+    // "#slug"
+    if (href.startsWith("#")) {
+      const slug = href.slice(1).toLowerCase();
+      return knownSlugs.has(slug) ? ("/" + sitename + "?p=" + encodeURIComponent(slug)) : null;
+    }
+
+    // "/slug" or "slug"
+    const cleaned = href.replace(/^\/+/, "").toLowerCase();
+    if (knownSlugs.has(cleaned)) {
+      return "/" + sitename + "?p=" + encodeURIComponent(cleaned);
+    }
+
+    // Otherwise, keep original (could be an anchor in-page)
+    return null;
+  }
 
   async function render() {
+    const { sitename, slug } = parseRoute();
+    sitePathEl.textContent = sitename ? "/" + sitename : "/";
     if (!sitename) {
-      $("#content").innerHTML = `<h2>Welcome</h2><p class="muted">Visit <code>/&lt;sitename&gt;</code> for a published site.</p>`;
+      document.title = "LearningNova – Sites";
+      pubBadge.textContent = "";
+      nav.innerHTML = "";
+      content.innerHTML = `<h2>Welcome</h2><p class="muted">Visit <code>/&lt;sitename&gt;</code> for a published site.</p>`;
       return;
     }
 
     const ref = doc(db, "sites", sitename);
     const snap = await getDoc(ref);
-
     if (!snap.exists()) {
-      $("#pubBadge").textContent = "";
-      $("#content").innerHTML = `<h2>Not found</h2><p class="muted">No such site.</p>`;
+      document.title = "Not found – LearningNova";
+      pubBadge.textContent = "";
+      nav.innerHTML = "";
+      content.innerHTML = `<h2>Not found</h2><p class="muted">No such site.</p>`;
       return;
     }
 
     const site = snap.data();
+    const pages = site.pages || {};
+    const slugs = Object.keys(pages);
+    const knownSlugs = new Set(slugs);
+
     document.title = (site.title || sitename) + " – LearningNova";
-    $("#pubBadge").textContent = site.published ? "published" : "unpublished";
+    pubBadge.textContent = site.published ? "published" : "unpublished";
 
     if (!site.published) {
-      $("#content").innerHTML = `<h2>Not published</h2><p class="muted">The owner hasn’t published this site yet.</p>`;
+      nav.innerHTML = "";
+      content.innerHTML = `<h2>Not published</h2><p class="muted">The owner hasn’t published this site yet.</p>`;
       return;
     }
 
-    // Build nav
-    const nav = $("#nav");
+    // Pick current slug (explicit ?p= wins; otherwise first slug)
+    const current = slug && knownSlugs.has(slug) ? slug : slugs[0];
+
+    // Build top nav with SPA click handlers
     nav.innerHTML = "";
-    const slugs = Object.keys(site.pages || {});
-    slugs.forEach(slug => {
+    slugs.forEach(s => {
       const a = document.createElement("a");
-      a.href = `/${sitename}?p=${encodeURIComponent(slug)}`;
-      a.textContent = site.pages[slug].title || slug;
-      if (slug === reqPage || (!reqPage && slug === slugs[0])) a.className = "pill";
+      a.textContent = pages[s].title || s;
+      a.href = "/" + sitename + "?p=" + encodeURIComponent(s);
+      if (s === current) a.classList.add("active");
+      a.addEventListener("click", (e)=>{
+        e.preventDefault();
+        setRoute(sitename, s);
+      });
       nav.appendChild(a);
     });
 
-    // Render selected page
-    const current = reqPage || slugs[0];
-    const page = site.pages[current];
-    if (!page) {
-      $("#content").innerHTML = `<h2>Page not found</h2>`;
-      return;
-    }
+    // Render page content
+    const page = pages[current];
+    const html = (page.blocks || []).filter(b=>b.type==="text").map(b=>b.html).join("\n");
+    content.innerHTML = html || `<p class="muted">No content yet.</p>`;
 
-    const html = (page.blocks || [])
-      .filter(b => b.type === "text")
-      .map(b => b.html || "")
-      .join("\n");
-
-    $("#content").innerHTML = html || `<p class="muted">No content yet.</p>`;
+    // Intercept internal links inside page content to ensure correct routing
+    content.querySelectorAll("a[href]").forEach(a=>{
+      const fix = normalizeInternalHref(a.getAttribute("href"), sitename, knownSlugs);
+      if (fix) {
+        a.setAttribute("href", fix);
+        a.addEventListener("click", (e)=>{
+          e.preventDefault();
+          // Extract slug from the fixed URL
+          const m = fix.match(/\?p=([^#&]+)/);
+          const targetSlug = m ? decodeURIComponent(m[1]) : "";
+          if (targetSlug) setRoute(sitename, targetSlug);
+        });
+      }
+    });
   }
 
   render();
