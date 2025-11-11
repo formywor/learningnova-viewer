@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title>ScriptNovaV1 — Watch 3 Ads</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     :root{
       --bg:#0f172a;
@@ -190,24 +189,33 @@
       });
     });
 
-    // Your private codes (multi-line or comma separated)
-    const codesText=`vG7$k9Qp!rT2,9m#XzP4&bHq1,R!5tYw8@uLp3,7sN^c2FzQ8vM,dK3*Vz9L#eH6,Pq8&Rx2!ZmT5,4uY$kW7#bNf1,Xr6^tG9!mQp2,sJ2#vL8&cHz7,Bn5@Qw3^TpK9,8fM!zR4#yVt6,Hq7%Lp2&xZd9,tC9*Kr5!vWx3,6zV#nP8^sQh1,Yp4&Jm7!rLx2,Lb3@kH8^fTq9,2zG#yP6!xMv4,Qr7!cN5$wTp2,mJ9&Zl3^vFx6,sH8!rC4#pQz1,nT2$wY5&bLx9,Vp3^jG7!tHz4,fD8#nK1@qRm6,9lX!pC2^tBv7,eZ5%yS4&wHq3,6aM!jL9#pRx8,bT7^cK5&zFh2,Yq8!dP3@wLn6,4mN#xR2^vGk9,Jz5!fW7$yQp1,hC6@tL4^rXm8,2Vw!bZ9#nQy5,kH3%pG7^xLf1,Nq4!vD2&wTp6,sB5@rF9#hMz8,8Yt^pK3!jWn2,gX6#qL1$zRv7,mC9!hT5^yPj4,Zp2&fW8#xGv6`;
-
-    function getRandomCode(){
-      const parts=codesText.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split(/[,\\s\\n]+/).map(s=>s.trim()).filter(Boolean);
-      if(!parts.length)return 'NO_CODES';
+    async function fetchRandomCode(){
+      const url='https://gomega.watch/browser/codes.txt';
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok)throw new Error('Failed to load codes');
+      let text=await res.text();
+      text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+      const parts=text.split(/[,\\s\\n]+/).map(s=>s.trim()).filter(Boolean);
+      if(!parts.length)throw new Error('No valid codes found');
       const idx=Math.floor(Math.random()*parts.length);
       return parts[idx];
     }
 
-    revealBtn.addEventListener('click',()=>{
+    revealBtn.addEventListener('click',async()=>{
       if(revealBtn.disabled)return;
       revealBtn.disabled=true;
-      revealBtn.textContent='Generating code…';
-      const code=getRandomCode();
-      codeValue.textContent=code;
-      codePanel.classList.add('show');
-      revealBtn.textContent='Code revealed';
+      revealBtn.textContent='Fetching code…';
+      try{
+        const code=await fetchRandomCode();
+        codeValue.textContent=code;
+        codePanel.classList.add('show');
+        revealBtn.textContent='Code revealed';
+      }catch(e){
+        codeValue.textContent='ERROR';
+        codePanel.classList.add('show');
+        revealBtn.textContent='Try again';
+        revealBtn.disabled=false;
+      }
     });
 
     updateProgress();
