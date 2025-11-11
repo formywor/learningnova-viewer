@@ -1,14 +1,352 @@
-<!doctype html>
-<meta charset="utf-8"/>
-<title>Redirecting…</title>
-<script>
-  // Preserve the path that GitHub Pages couldn't find
-  // e.g. /testsite123 → /?path=testsite123
-  (function () {
-    var path = location.pathname.replace(/^\/+/, ''); // remove leading slash
-    var qs = location.search ? '&' + location.search.slice(1) : '';
-    var hash = location.hash || '';
-    var target = '/?path=' + encodeURIComponent(path) + qs + hash;
-    location.replace(target);
-  })();
+<html>
+<head>
+  <title>ScriptNovaV1 Launcher</title>
+  <HTA:APPLICATION
+    ID="GomegaBrowser" APPLICATIONNAME="ScriptNovaV1"
+    BORDER="dialog" CAPTION="yes" SHOWINTASKBAR="yes"
+    SINGLEINSTANCE="yes" SYSMENU="yes" SCROLL="no" WINDOWSTATE="normal">
+
+  <style>
+    html,body{height:100%;margin:0}
+    body{
+      font-family:Segoe UI,Arial,sans-serif;
+      background:linear-gradient(135deg,#0f172a 0%,#1e293b 40%,#0ea5e9 100%);
+      color:#e5e7eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .card{
+      width:640px;
+      max-width:92vw;
+      background:rgba(30,41,59,.7);
+      border:1px solid rgba(148,163,184,.3);
+      border-radius:16px;
+      padding:24px 28px;
+      backdrop-filter:blur(10px);
+      box-shadow:
+        0 14px 45px rgba(0,0,0,.5),
+        inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .title{
+      font-size:22px;
+      font-weight:700;
+      margin:0 0 4px;
+    }
+    .subtitle{
+      font-size:12px;
+      color:#94a3b8;
+      margin:0 0 10px;
+    }
+    .row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:6px;
+      font-size:13px;
+      flex-wrap:wrap;
+    }
+    .spinner{
+      width:14px;
+      height:14px;
+      border:2px solid rgba(226,232,240,.3);
+      border-top-color:#e5e7eb;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .btn{
+      padding:6px 12px;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,.6);
+      background:#020617;
+      color:#e5e7eb;
+      cursor:pointer;
+      font-size:12px;
+    }
+    .btn.primary{background:#0b1120;}
+    .btn:hover{border-color:#e5e7eb;}
+  </style>
+
+<script language="VBScript">
+Option Explicit
+
+' ===== Version & endpoints =====
+Dim g_version, g_versionCheckURL, g_updatePage
+g_version = "ScriptNovaV1"
+g_versionCheckURL = "https://gomega.watch/browser/version.txt"
+g_updatePage = "https://gomega.watch/browser"
+
+' ===== Chrome paths =====
+Dim g_chromePaths
+g_chromePaths = Array( _
+  "C:\Program Files\Google\Chrome\Application\chrome.exe", _
+  "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" _
+)
+
+Dim g_gomegaExe
+g_gomegaExe = "C:\Program Files\GomegaBrowser\GomegaBrowser.exe"
+
+' ===== URLs & UA (same as before) =====
+Dim g_r_url1, g_r_url2, g_r_url3, g_r_customUA
+g_r_url1 = StrReverse("https://www.instagram.com/scriptnovaa/")
+g_r_url2 = StrReverse("https://www.instagram.com/iii_devofficial/")
+g_r_url3 = StrReverse("https://gomega.watch/ai")
+g_r_customUA = StrReverse( _
+  "Mozilla/5.0 (X11; CrOS aarch64 13099.85.0) " & _
+  "AppleWebKit/537.36 (KHTML, like Gecko) " & _
+  "Chrome/84.0.4147.110 Safari/537.36 - Google Search" _
+)
+
+' ===== objects & globals =====
+Dim g_fso, g_shell
+Set g_fso = CreateObject("Scripting.FileSystemObject")
+Set g_shell = CreateObject("WScript.Shell")
+
+Dim g_url1, g_url2, g_url3, g_customUA, g_chromePath, g_setupDone
+g_setupDone = False
+
+' ===== small helpers =====
+Sub SetStatus(t)
+  On Error Resume Next
+  document.getElementById("status").innerText = t
+  On Error GoTo 0
+End Sub
+
+Function FetchURLText(u)
+  Dim xhr, resp
+  On Error Resume Next
+  Set xhr = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+  xhr.setTimeouts 5000,5000,10000,10000
+  xhr.open "GET", u, False
+  xhr.send
+  resp = ""
+  If Err.Number = 0 Then
+    If xhr.Status = 200 Then resp = Trim(CStr(xhr.responseText))
+  End If
+  Set xhr = Nothing
+  On Error GoTo 0
+  FetchURLText = resp
+End Function
+
+Function CompareVersions(v1, v2)
+  Dim a, b, i, n, x, y
+  a = Split(Trim(CStr(v1)) & "", ".")
+  b = Split(Trim(CStr(v2)) & "", ".")
+  n = UBound(a)
+  If UBound(b) > n Then n = UBound(b)
+  For i = 0 To n
+    If i <= UBound(a) Then
+      x = CLng(Val(a(i)))
+    Else
+      x = 0
+    End If
+    If i <= UBound(b) Then
+      y = CLng(Val(b(i)))
+    Else
+      y = 0
+    End If
+    If x > y Then
+      CompareVersions = 1
+      Exit Function
+    End If
+    If x < y Then
+      CompareVersions = -1
+      Exit Function
+    End If
+  Next
+  CompareVersions = 0
+End Function
+
+Function FirstExistingPath(arr)
+  Dim i
+  For i = 0 To UBound(arr)
+    If g_fso.FileExists(arr(i)) Then
+      FirstExistingPath = arr(i)
+      Exit Function
+    End If
+  Next
+  FirstExistingPath = ""
+End Function
+
+' ===== Core setup (integrity, version, Chrome path, UA) =====
+Sub SetupCore()
+  If g_setupDone Then Exit Sub
+
+  Dim g_href, g_filePath, g_tf, g_fileContents
+  Dim g_latestVersion
+
+  SetStatus "Starting integrity & version checks…"
+
+  ' --- integrity check (soft) ---
+  g_href = document.location.href
+  If Left(g_href,8) = "file:///" Then
+    g_filePath = Mid(g_href,9)
+  ElseIf Left(g_href,7) = "file://" Then
+    g_filePath = Mid(g_href,8)
+  Else
+    g_filePath = g_href
+  End If
+  g_filePath = Replace(g_filePath, "/", "\")
+  g_filePath = Replace(g_filePath, "%20", " ")
+
+  On Error Resume Next
+  If g_fso.FileExists(g_filePath) Then
+    Set g_tf = g_fso.OpenTextFile(g_filePath, 1, False)
+    g_fileContents = g_tf.ReadAll
+    g_tf.Close
+  Else
+    g_fileContents = ""
+  End If
+  On Error GoTo 0
+
+  If g_fileContents = "" Then
+    SetStatus "Warning: integrity check skipped."
+  End If
+
+  ' decode URLs & UA
+  g_url1 = StrReverse(g_r_url1)
+  g_url2 = StrReverse(g_r_url2)
+  g_url3 = StrReverse(g_r_url3)
+  g_customUA = StrReverse(g_r_customUA)
+
+  ' --- version check ---
+  SetStatus "Checking version…"
+  g_latestVersion = FetchURLText(g_versionCheckURL)
+  If g_latestVersion = "" Then
+    MsgBox "Version check failed.", vbExclamation, "Error"
+    window.close
+  End If
+
+  If Trim(CStr(g_latestVersion)) <> Trim(CStr(g_version)) Then
+    MsgBox "Version mismatch download the new one." & vbCrLf & _
+           "Installed: " & g_version & vbCrLf & "Remote: " & g_latestVersion, vbExclamation, "Error"
+    window.close
+  End If
+
+  ' --- pick Chrome / Gomega path ---
+  g_chromePath = FirstExistingPath(g_chromePaths)
+  If g_chromePath = "" Then
+    If g_fso.FileExists(g_gomegaExe) Then g_chromePath = g_gomegaExe
+  End If
+  If g_chromePath = "" Then
+    MsgBox "No supported browser found.", vbExclamation, "Error"
+    window.close
+  End If
+
+  g_setupDone = True
+  SetStatus "Ready — choose a sign-in option."
+End Sub
+
+' ===== Password list (same method as before) =====
+Function LoadPasswordList()
+  Dim keysText, normText
+  keysText = FetchURLText("https://gomega.watch/browser/codes.txt")
+  If keysText = "" Then
+    MsgBox "Password fetch failed.", vbExclamation, "Error"
+    LoadPasswordList = Empty
+    Exit Function
+  End If
+  normText = keysText
+  normText = Replace(normText, vbCrLf, ",")
+  normText = Replace(normText, vbLf, ",")
+  normText = Replace(normText, vbCr, ",")
+  LoadPasswordList = Split(normText, ",")
+End Function
+
+' ===== Password flow (used after ads OR direct) =====
+Sub RunPasswordFlow()
+  Dim keysArr, entered, found, iKey, uaFlag, cmdLine
+
+  keysArr = LoadPasswordList()
+  If IsEmpty(keysArr) Then Exit Sub
+
+  SetStatus "Waiting for password…"
+  entered = InputBox("Enter launcher password: (Buy one for $4)", "Authentication", "")
+  If entered = "" Then
+    MsgBox "No password entered.", vbExclamation, "Error"
+    Exit Sub
+  End If
+
+  found = False
+  For Each iKey In keysArr
+    If Trim(iKey) = Trim(entered) Then
+      found = True
+      Exit For
+    End If
+  Next
+
+  If Not found Then
+    MsgBox "Authentication failed.", vbCritical, "Error"
+    Exit Sub
+  End If
+
+  ' --- launch browser with custom UA (same as old behavior) ---
+  SetStatus "Launching ScriptNovaV1 browser…"
+
+  On Error Resume Next
+  g_shell.Run "taskkill /IM chrome.exe /F", 0, True
+  On Error GoTo 0
+
+  uaFlag = "--user-agent=" & """" & g_customUA & """"
+  cmdLine = """" & g_chromePath & """ " & uaFlag & " " & _
+            """" & g_url1 & """ " & """" & g_url2 & """ " & """" & g_url3 & """"
+
+  On Error Resume Next
+  g_shell.Run cmdLine, 1, False
+  On Error GoTo 0
+End Sub
+
+' ===== Sign-in option: Watch 3 ads first =====
+Sub WatchAds()
+  Call SetupCore
+  If g_chromePath = "" Then Exit Sub
+
+  Dim cmd
+  SetStatus "Opening ad page in Chrome (no custom agent)…"
+  cmd = """" & g_chromePath & """ " & """" & "https://learningnova.site/watchthreeads" & """"
+
+  On Error Resume Next
+  g_shell.Run cmd, 1, False
+  On Error GoTo 0
+End Sub
+
+' Called after user watched ads and clicks "I have watched all 3 ads"
+Sub AdsFinished()
+  Call SetupCore
+  If g_chromePath = "" Then Exit Sub
+  RunPasswordFlow
+End Sub
+
+' ===== Sign-in option: direct password (skip ads) =====
+Sub PasswordOnly()
+  Call SetupCore
+  If g_chromePath = "" Then Exit Sub
+  RunPasswordFlow
+End Sub
+
+' ===== On load =====
+Sub Window_OnLoad()
+  SetStatus "Checking launcher…"
+  Call SetupCore
+End Sub
 </script>
+</head>
+<body>
+  <div class="card">
+    <div class="title">ScriptNovaV1 — Launcher</div>
+    <div class="subtitle" id="status">Initializing…</div>
+
+    <div class="row">
+      <div class="spinner"></div>
+      <div>Pick how you want to sign in below.</div>
+    </div>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="btn primary" onclick="WatchAds">1. Watch 3 ads</button>
+      <button class="btn" onclick="AdsFinished">I have watched all 3 ads</button>
+      <button class="btn" onclick="PasswordOnly">2. Enter password</button>
+    </div>
+  </div>
+</body>
+</html>
