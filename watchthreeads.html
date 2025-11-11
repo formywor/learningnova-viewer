@@ -23,12 +23,7 @@
       background:radial-gradient(circle at top,#0ea5e9 0,#020617 42%) fixed;
       color:var(--ink);
     }
-    body{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-    }
+    body{display:flex;align-items:center;justify-content:center;padding:20px;}
     .shell{max-width:980px;width:100%;}
     .card{
       background:rgba(15,23,42,.95);
@@ -38,156 +33,55 @@
       padding:22px 24px 24px;
       backdrop-filter:blur(12px);
     }
-    header{
-      display:flex;
-      align-items:flex-start;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-    .logo{
-      width:46px;height:46px;border-radius:16px;
+    header{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+    .logo{width:46px;height:46px;border-radius:16px;
       background:conic-gradient(from 210deg,#22c55e,#0ea5e9,#6366f1,#22c55e);
-      position:relative;overflow:hidden;
-    }
-    .logo::after{
-      content:"SN";
-      position:absolute;inset:0;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:800;font-size:19px;
-      color:rgba(15,23,42,.95);
-      text-shadow:0 0 12px rgba(15,23,42,.9);
-    }
+      position:relative;overflow:hidden;}
+    .logo::after{content:"SN";position:absolute;inset:0;display:flex;
+      align-items:center;justify-content:center;font-weight:800;font-size:19px;
+      color:rgba(15,23,42,.95);text-shadow:0 0 12px rgba(15,23,42,.9);}
     h1{margin:0;font-size:22px;}
     .tagline{margin:4px 0 0;font-size:13px;color:var(--muted);}
     .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-    .pill{
-      font-size:11px;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.45);
-      background:#020617;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-    .pill span.dot{
-      width:7px;height:7px;border-radius:999px;background:var(--accent2);
-      box-shadow:0 0 8px rgba(34,197,94,.9);
-    }
+    .pill{font-size:11px;padding:4px 10px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.45);background:#020617;
+      display:inline-flex;align-items:center;gap:6px;}
+    .pill span.dot{width:7px;height:7px;border-radius:999px;background:var(--accent2);
+      box-shadow:0 0 8px rgba(34,197,94,.9);}
     .pill.info span.dot{background:#38bdf8;box-shadow:0 0 8px rgba(56,189,248,.9);}
     .pill.warn span.dot{background:#facc15;box-shadow:0 0 8px rgba(250,204,21,.9);}
     .content{margin-top:16px;font-size:14px;color:var(--muted);}
-    .ads-grid{
-      display:grid;
-      grid-template-columns:repeat(12,1fr);
-      gap:14px;
-      margin-top:16px;
-    }
-    .ad-tile{
-      grid-column:span 12;
-      background:rgba(15,23,42,.9);
-      border-radius:14px;
-      border:1px solid rgba(30,64,175,.5);
-      padding:12px 14px 14px;
-    }
+    .ads-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:16px;}
+    .ad-tile{grid-column:span 12;background:rgba(15,23,42,.9);
+      border-radius:14px;border:1px solid rgba(30,64,175,.5);
+      padding:12px 14px 14px;}
     @media(min-width:840px){.ad-tile{grid-column:span 4;}}
-    .ad-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:6px;
-    }
-    .ad-title{
-      font-size:13px;
-      color:#e5e7eb;
-      font-weight:600;
-    }
-    .ad-status{
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.5);
-      background:#020617;
-    }
-    .ad-status.done{
-      border-color:rgba(34,197,94,.7);
-      color:#bbf7d0;
-      background:rgba(21,128,61,.3);
-    }
-    .ad-status.playing{
-      border-color:rgba(56,189,248,.7);
-      color:#e0f2fe;
-      background:rgba(15,23,42,.9);
-    }
-    video{
-      width:100%;
-      border-radius:10px;
-      background:#000;
-      outline:none;
-    }
-    .hint{
-      font-size:11px;
-      margin-top:4px;
-      color:#9ca3af;
-    }
-    .actions{
-      margin-top:18px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .btn{
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.6);
-      background:#020617;
-      color:#e5e7eb;
-      font-size:13px;
-      cursor:pointer;
-    }
-    .btn.primary{
-      background:linear-gradient(135deg,#0ea5e9,#22c55e);
-      border-color:transparent;
-      color:#0f172a;
-      font-weight:600;
-    }
-    .btn:disabled{
-      opacity:.4;
-      cursor:not-allowed;
-    }
-    .code-panel{
-      margin-top:18px;
-      padding:14px 16px;
-      border-radius:14px;
+    .ad-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+    .ad-title{font-size:13px;color:#e5e7eb;font-weight:600;}
+    .ad-status{font-size:11px;padding:3px 8px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.5);background:#020617;}
+    .ad-status.done{border-color:rgba(34,197,94,.7);color:#bbf7d0;background:rgba(21,128,61,.3);}
+    .ad-status.playing{border-color:rgba(56,189,248,.7);color:#e0f2fe;background:rgba(15,23,42,.9);}
+    video{width:100%;border-radius:10px;background:#000;outline:none;}
+    .hint{font-size:11px;margin-top:4px;color:#9ca3af;}
+    .actions{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+    .btn{padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.6);
+      background:#020617;color:#e5e7eb;font-size:13px;cursor:pointer;}
+    .btn.primary{background:linear-gradient(135deg,#0ea5e9,#22c55e);
+      border-color:transparent;color:#0f172a;font-weight:600;}
+    .btn:disabled{opacity:.4;cursor:not-allowed;}
+    .code-panel{margin-top:18px;padding:14px 16px;border-radius:14px;
       border:1px solid rgba(34,197,94,.4);
       background:linear-gradient(135deg,rgba(22,163,74,.18),rgba(15,23,42,.96));
-      color:#dcfce7;
-      display:none;
-      overflow:hidden;
-    }
-    .code-panel.show{
-      display:block;
-      animation:reveal .45s ease-out forwards;
-    }
-    @keyframes reveal{
-      from{opacity:0;transform:translateY(8px) scale(.98);}
-      to{opacity:1;transform:translateY(0) scale(1);}
-    }
+      color:#dcfce7;display:none;overflow:hidden;}
+    .code-panel.show{display:block;animation:reveal .45s ease-out forwards;}
+    @keyframes reveal{from{opacity:0;transform:translateY(8px) scale(.98);}
+      to{opacity:1;transform:translateY(0) scale(1);}}
     .code-label{font-size:13px;margin-bottom:4px;}
-    .code-value{
-      font-family:Consolas,Menlo,monospace;
-      font-size:20px;
-      padding:6px 10px;
-      border-radius:10px;
-      background:rgba(15,23,42,.95);
-      border:1px dashed rgba(187,247,208,.7);
-      color:#bbf7d0;
-      letter-spacing:.12em;
-      display:inline-block;
-      margin-bottom:6px;
-    }
+    .code-value{font-family:Consolas,Menlo,monospace;font-size:20px;
+      padding:6px 10px;border-radius:10px;background:rgba(15,23,42,.95);
+      border:1px dashed rgba(187,247,208,.7);color:#bbf7d0;letter-spacing:.12em;
+      display:inline-block;margin-bottom:6px;}
     .code-note{font-size:12px;color:#e5e7eb;}
     .status-text{font-size:12px;color:#9ca3af;margin-top:4px;}
   </style>
@@ -196,37 +90,40 @@
   <div class="shell">
     <div class="card">
       <header>
-        <div class="logo" aria-hidden="true"></div>
+        <div class="logo"></div>
         <div>
           <h1>ScriptNovaV1 — Watch 3 Ads to Unlock</h1>
-          <p class="tagline">Watch all three video ads. When they finish, you’ll get your access code.</p>
+          <p class="tagline">Watch all three video ads completely to unlock your password.</p>
           <div class="pill-row">
             <div class="pill"><span class="dot"></span><span>Step 1: Watch 3 ads fully</span></div>
-            <div class="pill info"><span class="dot"></span><span>Step 2: Get a random active code</span></div>
+            <div class="pill info"><span class="dot"></span><span>Step 2: Get a random code</span></div>
             <div class="pill warn"><span class="dot"></span><span>Step 3: Enter it in ScriptNovaV1 launcher</span></div>
           </div>
         </div>
       </header>
 
       <div class="content">
-        <p>Keep this page open, press play on each video, and let it run to the end. When all three are complete, your unlock code will appear.</p>
+        <p>Press play on each video and let it finish. When all three are complete, your unlock code will appear.</p>
 
         <div class="ads-grid">
-          <div class="ad-tile"><div class="ad-head"><div class="ad-title">Ad 1</div><div class="ad-status" id="status1">Not started</div></div>
+          <div class="ad-tile">
+            <div class="ad-head"><div class="ad-title">Ad 1</div><div class="ad-status" id="status1">Not started</div></div>
             <video id="video1" preload="metadata" controls>
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
             </video>
-            <div class="hint">You must watch this video fully.</div>
+            <div class="hint">You must watch this ad fully.</div>
           </div>
 
-          <div class="ad-tile"><div class="ad-head"><div class="ad-title">Ad 2</div><div class="ad-status" id="status2">Not started</div></div>
+          <div class="ad-tile">
+            <div class="ad-head"><div class="ad-title">Ad 2</div><div class="ad-status" id="status2">Not started</div></div>
             <video id="video2" preload="metadata" controls>
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm">
             </video>
             <div class="hint">Skipping or fast-forwarding will reset the video.</div>
           </div>
 
-          <div class="ad-tile"><div class="ad-head"><div class="ad-title">Ad 3</div><div class="ad-status" id="status3">Not started</div></div>
+          <div class="ad-tile">
+            <div class="ad-head"><div class="ad-title">Ad 3</div><div class="ad-status" id="status3">Not started</div></div>
             <video id="video3" preload="metadata" controls>
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
             </video>
@@ -242,7 +139,7 @@
         <div class="code-panel" id="codePanel">
           <div class="code-label">Your code is:</div>
           <div class="code-value" id="codeValue">••••••••</div>
-          <div class="code-note">Enter this password in your ScriptNovaV1 launcher.</div>
+          <div class="code-note">Enter this code in your launcher to continue.</div>
         </div>
       </div>
     </div>
@@ -285,35 +182,32 @@
           alert("Skipping is disabled. Please watch the full video.");
         }
       });
+      v.addEventListener('pause',()=>{
+        if(!completed[idx] && v.currentTime < v.duration-1){
+          v.currentTime=0;
+          alert("Please do not pause. Watch the ad completely.");
+        }
+      });
     });
 
-    async function fetchRandomCode(){
-      const url='https://gomega.watch/hidden/codes.txt'; // hidden location
-      const res=await fetch(url,{cache:'no-store'});
-      if(!res.ok)throw new Error('Failed to load codes');
-      let text=await res.text();
-      text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-      const parts=text.split(/[,\\s\\n]+/).map(s=>s.trim()).filter(Boolean);
-      if(!parts.length)throw new Error('No valid codes found');
+    // Your private codes (multi-line or comma separated)
+    const codesText=`vG7$k9Qp!rT2,9m#XzP4&bHq1,R!5tYw8@uLp3,7sN^c2FzQ8vM,dK3*Vz9L#eH6,Pq8&Rx2!ZmT5,4uY$kW7#bNf1,Xr6^tG9!mQp2,sJ2#vL8&cHz7,Bn5@Qw3^TpK9,8fM!zR4#yVt6,Hq7%Lp2&xZd9,tC9*Kr5!vWx3,6zV#nP8^sQh1,Yp4&Jm7!rLx2,Lb3@kH8^fTq9,2zG#yP6!xMv4,Qr7!cN5$wTp2,mJ9&Zl3^vFx6,sH8!rC4#pQz1,nT2$wY5&bLx9,Vp3^jG7!tHz4,fD8#nK1@qRm6,9lX!pC2^tBv7,eZ5%yS4&wHq3,6aM!jL9#pRx8,bT7^cK5&zFh2,Yq8!dP3@wLn6,4mN#xR2^vGk9,Jz5!fW7$yQp1,hC6@tL4^rXm8,2Vw!bZ9#nQy5,kH3%pG7^xLf1,Nq4!vD2&wTp6,sB5@rF9#hMz8,8Yt^pK3!jWn2,gX6#qL1$zRv7,mC9!hT5^yPj4,Zp2&fW8#xGv6`;
+
+    function getRandomCode(){
+      const parts=codesText.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split(/[,\\s\\n]+/).map(s=>s.trim()).filter(Boolean);
+      if(!parts.length)return 'NO_CODES';
       const idx=Math.floor(Math.random()*parts.length);
       return parts[idx];
     }
 
-    revealBtn.addEventListener('click',async()=>{
+    revealBtn.addEventListener('click',()=>{
       if(revealBtn.disabled)return;
       revealBtn.disabled=true;
-      revealBtn.textContent='Fetching code…';
-      try{
-        const code=await fetchRandomCode();
-        codeValue.textContent=code;
-        codePanel.classList.add('show');
-        revealBtn.textContent='Code revealed';
-      }catch(e){
-        codeValue.textContent='ERROR';
-        codePanel.classList.add('show');
-        revealBtn.textContent='Try again';
-        revealBtn.disabled=false;
-      }
+      revealBtn.textContent='Generating code…';
+      const code=getRandomCode();
+      codeValue.textContent=code;
+      codePanel.classList.add('show');
+      revealBtn.textContent='Code revealed';
     });
 
     updateProgress();
