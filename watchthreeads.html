@@ -30,10 +30,7 @@
       justify-content:center;
       padding:20px;
     }
-    .shell{
-      max-width:980px;
-      width:100%;
-    }
+    .shell{max-width:980px;width:100%;}
     .card{
       background:rgba(15,23,42,.95);
       border-radius:20px;
@@ -51,29 +48,21 @@
     .logo{
       width:46px;height:46px;border-radius:16px;
       background:conic-gradient(from 210deg,#22c55e,#0ea5e9,#6366f1,#22c55e);
-      position:relative;
-      overflow:hidden;
+      position:relative;overflow:hidden;
     }
     .logo::after{
-      content:"SN";
-      position:absolute;inset:0;
+      content:"SN";position:absolute;inset:0;
       display:flex;align-items:center;justify-content:center;
       font-weight:800;font-size:19px;
-      color:rgba(15,23,42,.95);
-      text-shadow:0 0 12px rgba(15,23,42,.9);
+      color:rgba(15,23,42,.95);text-shadow:0 0 12px rgba(15,23,42,.9);
     }
     h1{margin:0;font-size:22px;}
     .tagline{margin:4px 0 0;font-size:13px;color:var(--muted);}
     .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
     .pill{
-      font-size:11px;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.45);
-      background:#020617;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
+      font-size:11px;padding:4px 10px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.45);background:#020617;
+      display:inline-flex;align-items:center;gap:6px;
     }
     .pill span.dot{
       width:7px;height:7px;border-radius:999px;background:var(--accent2);
@@ -82,148 +71,64 @@
     .pill.info span.dot{background:#38bdf8;box-shadow:0 0 8px rgba(56,189,248,.9);}
     .pill.warn span.dot{background:#facc15;box-shadow:0 0 8px rgba(250,204,21,.9);}
     .content{margin-top:16px;font-size:14px;color:var(--muted);}
-
     .ads-grid{
-      display:grid;
-      grid-template-columns:repeat(12,1fr);
-      gap:14px;
-      margin-top:16px;
+      display:grid;grid-template-columns:repeat(12,1fr);
+      gap:14px;margin-top:16px;
     }
     .ad-tile{
-      grid-column:span 12;
-      background:rgba(15,23,42,.9);
-      border-radius:14px;
-      border:1px solid rgba(30,64,175,.5);
+      grid-column:span 12;background:rgba(15,23,42,.9);
+      border-radius:14px;border:1px solid rgba(30,64,175,.5);
       padding:12px 14px 14px;
     }
-    @media(min-width:840px){
-      .ad-tile{grid-column:span 4;}
-    }
-    .ad-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:6px;
-    }
-    .ad-title{
-      font-size:13px;
-      color:#e5e7eb;
-      font-weight:600;
-    }
+    @media(min-width:840px){.ad-tile{grid-column:span 4;}}
+    .ad-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+    .ad-title{font-size:13px;color:#e5e7eb;font-weight:600;}
     .ad-status{
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.5);
-      background:#020617;
+      font-size:11px;padding:3px 8px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.5);background:#020617;
     }
-    .ad-status.done{
-      border-color:rgba(34,197,94,.7);
-      color:#bbf7d0;
-      background:rgba(21,128,61,.3);
-    }
-    .ad-status.playing{
-      border-color:rgba(56,189,248,.7);
-      color:#e0f2fe;
-      background:rgba(15,23,42,.9);
-    }
-    video{
-      width:100%;
-      border-radius:10px;
-      background:#000;
-      outline:none;
-    }
-    .hint{
-      font-size:11px;
-      margin-top:4px;
-      color:#9ca3af;
-    }
-
-    .actions{
-      margin-top:18px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-    }
+    .ad-status.done{border-color:rgba(34,197,94,.7);color:#bbf7d0;background:rgba(21,128,61,.3);}
+    .ad-status.playing{border-color:rgba(56,189,248,.7);color:#e0f2fe;background:rgba(15,23,42,.9);}
+    video{width:100%;border-radius:10px;background:#000;outline:none;}
+    .hint{font-size:11px;margin-top:4px;color:#9ca3af;}
+    .actions{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
     .btn{
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.6);
-      background:#020617;
-      color:#e5e7eb;
-      font-size:13px;
-      cursor:pointer;
+      padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.6);
+      background:#020617;color:#e5e7eb;font-size:13px;cursor:pointer;
     }
     .btn.primary{
       background:linear-gradient(135deg,#0ea5e9,#22c55e);
-      border-color:transparent;
-      color:#0f172a;
-      font-weight:600;
+      border-color:transparent;color:#0f172a;font-weight:600;
     }
-    .btn:disabled{
-      opacity:.4;
-      cursor:not-allowed;
-    }
-
+    .btn:disabled{opacity:.4;cursor:not-allowed;}
     .code-panel{
-      margin-top:18px;
-      padding:14px 16px;
-      border-radius:14px;
+      margin-top:18px;padding:14px 16px;border-radius:14px;
       border:1px solid rgba(34,197,94,.4);
       background:linear-gradient(135deg,rgba(22,163,74,.18),rgba(15,23,42,.96));
-      color:#dcfce7;
-      display:none;
-      overflow:hidden;
+      color:#dcfce7;display:none;overflow:hidden;
     }
-    .code-panel.show{
-      display:block;
-      animation:reveal .45s ease-out forwards;
-    }
-    @keyframes reveal{
-      from{opacity:0;transform:translateY(8px) scale(.98);}
-      to{opacity:1;transform:translateY(0) scale(1);}
-    }
-    .code-label{
-      font-size:13px;
-      margin-bottom:4px;
-    }
+    .code-panel.show{display:block;animation:reveal .45s ease-out forwards;}
+    @keyframes reveal{from{opacity:0;transform:translateY(8px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .code-label{font-size:13px;margin-bottom:4px;}
     .code-value{
-      font-family:Consolas,Menlo,monospace;
-      font-size:20px;
-      padding:6px 10px;
-      border-radius:10px;
-      background:rgba(15,23,42,.95);
-      border:1px dashed rgba(187,247,208,.7);
-      color:#bbf7d0;
-      letter-spacing:.12em;
-      display:inline-block;
-      margin-bottom:6px;
+      font-family:Consolas,Menlo,monospace;font-size:20px;padding:6px 10px;
+      border-radius:10px;background:rgba(15,23,42,.95);
+      border:1px dashed rgba(187,247,208,.7);color:#bbf7d0;
+      letter-spacing:.12em;display:inline-block;margin-bottom:6px;
     }
-    .code-note{
-      font-size:12px;
-      color:#e5e7eb;
-    }
-    .status-text{
-      font-size:12px;
-      color:#9ca3af;
-      margin-top:4px;
-    }
-    a{color:#7dd3fc;text-decoration:none;}
-    a:hover{text-decoration:underline;}
+    .code-note{font-size:12px;color:#e5e7eb;}
+    .status-text{font-size:12px;color:#9ca3af;margin-top:4px;}
+    a{color:#7dd3fc;text-decoration:none;}a:hover{text-decoration:underline;}
   </style>
 </head>
 <body>
   <div class="shell">
     <div class="card">
       <header>
-        <div class="logo" aria-hidden="true"></div>
+        <div class="logo"></div>
         <div>
           <h1>ScriptNovaV1 — Watch 3 Ads to Unlock</h1>
-          <p class="tagline">
-            Watch all three video ads. When they finish, you’ll get the current launcher password.
-          </p>
+          <p class="tagline">Watch all three video ads. When they finish, you’ll get the current launcher password.</p>
           <div class="pill-row">
             <div class="pill"><span class="dot"></span><span>Step 1: Watch 3 ads fully</span></div>
             <div class="pill info"><span class="dot"></span><span>Step 2: Get a random active code</span></div>
@@ -233,68 +138,40 @@
       </header>
 
       <div class="content">
-        <p>
-          Keep this page open, press play on each video, and let it run to the end. When all three are complete,
-          you’ll be able to reveal a fresh code pulled live from
-          <code>browser/codes.txt</code>.
-        </p>
+        <p>Keep this page open, press play on each video, and let it run to the end. When all three are complete, you’ll be able to reveal a fresh code pulled live from <code>browser/codes.txt</code>.</p>
 
         <div class="ads-grid">
-          <!-- AD 1 -->
-          <div class="ad-tile" data-slot="1">
-            <div class="ad-head">
-              <div class="ad-title">Ad 1</div>
-              <div class="ad-status" id="status1">Not started</div>
-            </div>
-            <!-- Replace this <video> with your real ad tag later if you want -->
-            <video id="video1" controls preload="none">
+          <div class="ad-tile"><div class="ad-head"><div class="ad-title">Ad 1</div><div class="ad-status" id="status1">Not started</div></div>
+            <video id="video1" preload="auto" controlslist="nodownload nofullscreen noremoteplayback">
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
-              Your browser does not support the video tag.
             </video>
-            <div class="hint">Let the ad play from start to finish. Skipping or closing early will not count.</div>
+            <div class="hint">You cannot skip or fast forward the video.</div>
           </div>
 
-          <!-- AD 2 -->
-          <div class="ad-tile" data-slot="2">
-            <div class="ad-head">
-              <div class="ad-title">Ad 2</div>
-              <div class="ad-status" id="status2">Not started</div>
-            </div>
-            <video id="video2" controls preload="none">
+          <div class="ad-tile"><div class="ad-head"><div class="ad-title">Ad 2</div><div class="ad-status" id="status2">Not started</div></div>
+            <video id="video2" preload="auto" controlslist="nodownload nofullscreen noremoteplayback">
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm">
-              Your browser does not support the video tag.
             </video>
-            <div class="hint">You must let the full ad finish to unlock your code.</div>
+            <div class="hint">Ad must be watched completely to count.</div>
           </div>
 
-          <!-- AD 3 -->
-          <div class="ad-tile" data-slot="3">
-            <div class="ad-head">
-              <div class="ad-title">Ad 3</div>
-              <div class="ad-status" id="status3">Not started</div>
-            </div>
-            <video id="video3" controls preload="none">
+          <div class="ad-tile"><div class="ad-head"><div class="ad-title">Ad 3</div><div class="ad-status" id="status3">Not started</div></div>
+            <video id="video3" preload="auto" controlslist="nodownload nofullscreen noremoteplayback">
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
-              Your browser does not support the video tag.
             </video>
-            <div class="hint">After all 3 are complete, you can reveal your ScriptNovaV1 password.</div>
+            <div class="hint">Finish all ads to reveal your ScriptNovaV1 password.</div>
           </div>
         </div>
 
         <div class="actions">
-          <div>
-            <button class="btn primary" id="revealBtn" disabled>Reveal my code</button>
-          </div>
+          <div><button class="btn primary" id="revealBtn" disabled>Reveal my code</button></div>
           <div class="status-text" id="progressText">Progress: 0 / 3 ads completed.</div>
         </div>
 
         <div class="code-panel" id="codePanel">
           <div class="code-label">Your code is:</div>
           <div class="code-value" id="codeValue">••••••••</div>
-          <div class="code-note">
-            Go back to your <strong>ScriptNovaV1</strong> launcher and enter this password when it asks.
-            Codes are pulled live from <code>https://gomega.watch/</code>.
-          </div>
+          <div class="code-note">Go back to your <strong>ScriptNovaV1</strong> launcher and enter this password. Codes are pulled live from <code>https://gomega.watch/</code>.</div>
         </div>
       </div>
     </div>
@@ -302,96 +179,79 @@
 
   <script>
   (function(){
-    const videos = [
-      document.getElementById('video1'),
-      document.getElementById('video2'),
-      document.getElementById('video3')
-    ];
-    const statuses = [
-      document.getElementById('status1'),
-      document.getElementById('status2'),
-      document.getElementById('status3')
-    ];
-    const revealBtn   = document.getElementById('revealBtn');
-    const progressTxt = document.getElementById('progressText');
-    const codePanel   = document.getElementById('codePanel');
-    const codeValue   = document.getElementById('codeValue');
-
-    let completed = [false,false,false];
+    const videos=[video1,video2,video3];
+    const statuses=[status1,status2,status3];
+    const revealBtn=document.getElementById('revealBtn');
+    const progressTxt=document.getElementById('progressText');
+    const codePanel=document.getElementById('codePanel');
+    const codeValue=document.getElementById('codeValue');
+    let completed=[false,false,false];
 
     function updateProgress(){
-      const count = completed.filter(Boolean).length;
-      progressTxt.textContent = `Progress: ${count} / 3 ads completed.`;
-      if(count === 3){
-        revealBtn.disabled = false;
-        progressTxt.textContent = 'All ads completed — you can now reveal your code.';
+      const count=completed.filter(Boolean).length;
+      progressTxt.textContent=`Progress: ${count} / 3 ads completed.`;
+      if(count===3){
+        revealBtn.disabled=false;
+        progressTxt.textContent='All ads completed — you can now reveal your code.';
       }
     }
 
-    function setStatus(i, state){
-      const el = statuses[i];
-      if(!el) return;
+    function setStatus(i,state){
+      const el=statuses[i];
       el.classList.remove('done','playing');
-      if(state === 'playing'){
-        el.textContent = 'Playing…';
-        el.classList.add('playing');
-      }else if(state === 'done'){
-        el.textContent = 'Completed';
-        el.classList.add('done');
-      }else{
-        el.textContent = 'Not started';
-      }
+      if(state==='playing'){el.textContent='Playing…';el.classList.add('playing');}
+      else if(state==='done'){el.textContent='Completed';el.classList.add('done');}
+      else{el.textContent='Not started';}
     }
 
-    videos.forEach((v, idx)=>{
-      if(!v) return;
-      v.addEventListener('play', ()=>{
-        if(!completed[idx]) setStatus(idx,'playing');
+    // Prevent skipping: reset if seeked or paused early
+    videos.forEach((v,idx)=>{
+      v.addEventListener('play',()=>{if(!completed[idx])setStatus(idx,'playing');});
+      v.addEventListener('ended',()=>{completed[idx]=true;setStatus(idx,'done');updateProgress();});
+      v.addEventListener('pause',()=>{
+        if(!completed[idx]&&v.currentTime<v.duration-1){
+          v.currentTime=0;
+          v.play();
+          alert("Please watch the ad fully without skipping.");
+        }
       });
-      v.addEventListener('ended', ()=>{
-        completed[idx] = true;
-        setStatus(idx,'done');
-        updateProgress();
-      });
-      v.addEventListener('pause', ()=>{
+      v.addEventListener('seeking',()=>{
         if(!completed[idx]){
-          // if they pause before end, keep it as playing/not started
-          setStatus(idx, v.currentTime > 0 ? 'playing' : 'idle');
+          v.currentTime=0;
+          alert("Skipping is not allowed.");
         }
       });
     });
 
     async function fetchRandomCode(){
-      const url = 'https://gomega.watch/browser/codes.txt';
-      const res = await fetch(url, {cache:'no-store'});
-      if(!res.ok) throw new Error('Failed to load codes');
-      let text = await res.text();
-      // normalize separators: commas + newlines
-      text = text.replace(/\r\n/g, '\n').replace(/\r/g,'\n');
-      const parts = text.split(/[, \n]+/).map(s=>s.trim()).filter(Boolean);
-      if(!parts.length) throw new Error('No codes found');
-      const idx = Math.floor(Math.random()*parts.length);
+      const url='https://gomega.watch/browser/codes.txt';
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok)throw new Error('Failed to load codes');
+      let text=await res.text();
+      text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+      const parts=text.split(/[,\\s\\n]+/).map(s=>s.trim()).filter(Boolean);
+      if(!parts.length)throw new Error('No valid codes found');
+      const idx=Math.floor(Math.random()*parts.length);
       return parts[idx];
     }
 
-    revealBtn.addEventListener('click', async ()=>{
-      if(revealBtn.disabled) return;
-      revealBtn.disabled = true;
-      revealBtn.textContent = 'Fetching code…';
+    revealBtn.addEventListener('click',async()=>{
+      if(revealBtn.disabled)return;
+      revealBtn.disabled=true;
+      revealBtn.textContent='Fetching code…';
       try{
-        const code = await fetchRandomCode();
-        codeValue.textContent = code;
+        const code=await fetchRandomCode();
+        codeValue.textContent=code;
         codePanel.classList.add('show');
-        revealBtn.textContent = 'Code revealed';
+        revealBtn.textContent='Code revealed';
       }catch(e){
-        codeValue.textContent = 'ERROR';
+        codeValue.textContent='ERROR';
         codePanel.classList.add('show');
-        revealBtn.textContent = 'Try again';
-        revealBtn.disabled = false;
+        revealBtn.textContent='Try again';
+        revealBtn.disabled=false;
       }
     });
 
-    // initial state
     updateProgress();
   })();
   </script>
