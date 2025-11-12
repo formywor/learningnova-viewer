@@ -1,147 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dev Language Translator — ScriptNova</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dev Language — Translator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0f1c;
-    --panel: #10192b;
-    --accent: #00d4ff;
-    --accent2: #8f00ff;
-    --text: #e5e7eb;
+  :root{
+    --bg1:#071021;
+    --bg2:#0b1220;
+    --panel: rgba(255,255,255,0.03);
+    --accent:#00d4ff;
+    --accent2:#8f00ff;
+    --muted: #94a3b8;
+    --text:#e6eef6;
+    --glass: rgba(255,255,255,0.04);
   }
-  body {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
-    background: radial-gradient(circle at top left, var(--bg), #06080f);
-    color: var(--text);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(135deg,var(--bg1),var(--bg2));font-family:'Poppins',system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;color:var(--text);-webkit-font-smoothing:antialiased}
+  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:40px}
+  .card{
+    width:100%;
+    max-width:860px;
+    border-radius:18px;
+    padding:22px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow:0 10px 40px rgba(2,6,23,0.7);
+    border:1px solid rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    transform-origin:center;
+    animation:cardIn .6s ease;
   }
-  h1 {
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 2em;
-    margin-bottom: 20px;
-    animation: pulse 3s infinite alternate;
+  @keyframes cardIn { from { transform: translateY(6px) scale(.995); opacity:0 } to { transform:none; opacity:1 } }
+
+  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  .logo{
+    width:56px;height:56px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#001;
+    box-shadow:0 8px 30px rgba(0,0,0,0.6);
   }
-  @keyframes pulse {
-    from { opacity: 0.8; }
-    to { opacity: 1; }
+  h1{font-size:1.2rem;margin:0}
+  p.lead{margin:0;color:var(--muted);font-size:0.9rem}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  textarea{
+    width:100%;height:150px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+    background:var(--panel);color:var(--text);resize:vertical;font-size:1rem;outline:none;
+    transition:box-shadow .18s, transform .18s;
   }
-  .container {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 700px;
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+  textarea:focus{box-shadow:0 6px 30px rgba(0,212,255,0.06);transform:translateY(-2px)}
+
+  .controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:none;
+    cursor:pointer;font-weight:600;background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:white;box-shadow:0 8px 20px rgba(0,0,0,0.45);transition:transform .12s,opacity .12s;
   }
-  textarea {
-    width: 100%;
-    height: 120px;
-    background: rgba(255, 255, 255, 0.05);
-    border: none;
-    border-radius: 10px;
-    color: var(--text);
-    padding: 10px;
-    resize: none;
-    font-size: 1em;
-    outline: none;
+  .btn.secondary{
+    background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);font-weight:600;
   }
-  button {
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    font-size: 1em;
-    transition: 0.3s;
-    margin: 10px 5px;
+  .btn:active{transform:translateY(1px)}
+  .btn.clear{background:transparent;border:1px dashed rgba(255,255,255,0.04);color:var(--muted);padding:8px 10px}
+
+  .hint{font-size:0.85rem;color:var(--muted);margin-top:8px}
+
+  .output{
+    background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+    border-radius:10px;padding:14px;min-height:150px;border:1px solid rgba(255,255,255,0.03);
+    font-size:1.02rem;color:var(--accent);position:relative;overflow:auto;
   }
-  button:hover {
-    opacity: 0.8;
-    transform: translateY(-2px);
+  .output .english{color:var(--text);font-weight:500;margin-bottom:8px}
+  .fa-intro{font-size:0.9rem;color:var(--muted);margin-bottom:6px}
+
+  /* Translating overlay */
+  .overlay{
+    position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.2));
+    display:flex;align-items:center;justify-content:center;border-radius:10px;backdrop-filter:blur(4px);
+    opacity:0;pointer-events:none;transition:opacity .18s;
   }
-  .output {
-    margin-top: 10px;
-    font-size: 1.05em;
-    word-break: break-word;
-    color: #00eaff;
+  .overlay.show{opacity:1;pointer-events:auto}
+  .trans-box{
+    display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.03);
   }
-  .note {
-    font-size: 0.8em;
-    opacity: 0.6;
-    margin-top: 10px;
-  }
+  .dots{display:inline-block}
+  .dots span{display:inline-block;width:6px;height:6px;border-radius:50%;margin:0 3px;background:var(--accent);opacity:.9;animation:dots .9s infinite}
+  .dots span:nth-child(2){animation-delay:.12s}
+  .dots span:nth-child(3){animation-delay:.24s}
+  @keyframes dots{0%{transform:translateY(0);opacity:.35}50%{transform:translateY(-6px);opacity:1}100%{transform:translateY(0);opacity:.35}}
+
+  /* small UI tweaks */
+  .meta{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:12px}
+  .small{font-size:0.82rem;color:var(--muted)}
+  .accent-pill{background:linear-gradient(90deg,var(--accent),var(--accent2));padding:6px 10px;border-radius:999px;color:#001;font-weight:700;font-size:0.85rem}
+
+  /* responsive */
+  @media (max-width:800px){ .grid{grid-template-columns:1fr} .logo{width:48px;height:48px} }
 </style>
 </head>
 <body>
-<h1>Dev Language Translator</h1>
-<div class="container">
-  <textarea id="inputText" placeholder="Type something like: hi hows it going?"></textarea>
-  <div>
-    <button onclick="toDev()">Translate to Dev Language</button>
-    <button onclick="toEnglish()">Translate to English</button>
+  <div class="wrap">
+    <div class="card" role="application" aria-label="Dev Language Translator">
+      <header>
+        <div class="logo">DEV</div>
+        <div>
+          <h1>Dev Language Translator</h1>
+          <p class="lead">Translate English ↔ Dev Language. Dev Language names are preserved and greetings format as <code>(language hi) Name</code>.</p>
+        </div>
+      </header>
+
+      <div class="grid">
+        <div>
+          <label class="fa-intro">Input (type or edit):</label>
+          <textarea id="inputText" aria-label="Text to translate">hows it going?</textarea>
+
+          <div class="controls" style="margin-top:12px">
+            <button class="btn" id="toDevBtn" title="Translate the input into Dev Language">→ Translate to Dev Language</button>
+            <button class="btn secondary" id="toEngBtn" title="Translate Dev Language back to English">← Translate to English</button>
+            <button class="btn clear" id="swapBtn" title="Swap input and output quickly">Swap ↔</button>
+            <button class="btn clear" id="copyBtn" title="Copy the translated text">Copy</button>
+          </div>
+
+          <div class="hint">Tip: Greetings like <code>hi David</code> will translate to <code>(language hi) David</code>. Names (capitalized) are preserved.</div>
+        </div>
+
+        <div>
+          <label class="fa-intro">Output:</label>
+          <div class="output" id="outputBox" aria-live="polite">
+            <div class="overlay" id="overlay">
+              <div class="trans-box">
+                <div style="font-weight:700">Translating</div>
+                <div class="dots" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="english" id="sampleEnglish">Input preview will appear here.</div>
+            <div id="translatedText" style="word-break:break-word;white-space:pre-wrap;color:var(--accent);"></div>
+          </div>
+
+          <div class="meta">
+            <div class="small">Cipher: <span id="cipherId" style="color:var(--muted)">deterministic</span></div>
+            <div class="accent-pill">Dev Language</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="output" class="output"></div>
-  <div class="note">🔒 Only this site can translate Dev Language. It’s dynamically encrypted with ScriptNova’s Dev Cipher.</div>
-</div>
 
 <script>
-// Create an extremely obfuscated cipher (random per session)
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?";
-let cipher = {};
-let decipher = {};
-(function generateCipher(){
-  let shuffled = charset.split('').sort(()=>Math.random()-0.5).join('');
-  for (let i=0; i<charset.length; i++) {
-    cipher[charset[i]] = shuffled[i];
-    decipher[shuffled[i]] = charset[i];
+/*
+ Deterministic cipher:
+ - Uses a seeded PRNG so the mapping is stable (not random).
+ - Seed is a constant string in the page (you can change it to update all mappings site-wide).
+ - Maps lowercase, uppercase, digits and punctuation within the charset.
+*/
+
+// --------- seeded PRNG (mulberry32) and deterministic shuffle ----------
+function hashStrToSeed(s){
+  // simple hash -> 32-bit int
+  let h = 2166136261 >>> 0;
+  for (let i=0;i<s.length;i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h,16777619) >>> 0;
   }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+function shuffleArrayDeterministic(arr, seed){
+  const rand = mulberry32(seed);
+  const a = arr.slice();
+  for (let i=a.length-1;i>0;i--){
+    const j = Math.floor(rand()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// --------- build deterministic cipher ----------
+const SEED_PHRASE = "DevLanguageSeed2025"; // change this string to change the mapping globally
+const seed = hashStrToSeed(SEED_PHRASE);
+
+// Character sets we will map (keeps characters stable)
+const lower = "abcdefghijklmnopqrstuvwxyz".split('');
+const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+const digits = "0123456789".split('');
+const punctuation = "!?.,;:'\"()[]{}<>-_/\\@#$%^&*~`+=|:".split(''); // a wider set
+
+const shuffledLower = shuffleArrayDeterministic(lower, seed);
+const shuffledUpper = shuffleArrayDeterministic(upper, seed+1);
+const shuffledDigits = shuffleArrayDeterministic(digits, seed+2);
+const shuffledPunct = shuffleArrayDeterministic(punctuation, seed+3);
+
+// Build maps
+const cipherMap = {};
+const decipherMap = {};
+for (let i=0;i<lower.length;i++){ cipherMap[lower[i]] = shuffledLower[i]; decipherMap[shuffledLower[i]] = lower[i]; }
+for (let i=0;i<upper.length;i++){ cipherMap[upper[i]] = shuffledUpper[i]; decipherMap[shuffledUpper[i]] = upper[i]; }
+for (let i=0;i<digits.length;i++){ cipherMap[digits[i]] = shuffledDigits[i]; decipherMap[shuffledDigits[i]] = digits[i]; }
+for (let i=0;i<punctuation.length;i++){ cipherMap[punctuation[i]] = shuffledPunct[i]; decipherMap[shuffledPunct[i]] = punctuation[i]; }
+
+// Keep whitespace and other characters unchanged
+function encodeText(text){
+  // We encode character-by-character but keep certain rules:
+  // - Names (capitalized words) are preserved
+  // - Greeting pattern "hi Name" or "hello Name" becomes "(language hi) Name"
+  // For general words: encode letters/digits/punct using cipherMap
+  const tokens = splitPreserve(text);
+  const out = [];
+  for (let i=0;i<tokens.length;i++){
+    const tk = tokens[i];
+    // simple greeting detection: previous token is a greeting and this is a Name
+    const prev = (i>0)? tokens[i-1] : '';
+    if (isGreeting(prev) && isCapitalizedName(tk)){
+      out.push('(language hi)');
+      out.push(' ');
+      out.push(tk);
+      continue;
+    }
+
+    if (isCapitalizedName(tk)){
+      // preserve names as-is
+      out.push(tk);
+      continue;
+    }
+
+    // otherwise encode each character deterministically
+    let encoded = '';
+    for (let ch of tk){
+      encoded += cipherMap[ch] || ch;
+    }
+    out.push(encoded);
+  }
+  return out.join('');
+}
+
+function decodeText(text){
+  // reverse of encodeText — however if text contains the special marker "(language hi)" we translate accordingly
+  const tokens = splitPreserve(text);
+  const out = [];
+  for (let i=0;i<tokens.length;i++){
+    const tk = tokens[i];
+    if (tk === '(language hi)'){
+      // find next token (likely a name) and convert back to "hi Name"
+      const next = tokens[i+1] || '';
+      if (isCapitalizedName(next)){
+        out.push('hi');
+        out.push(' ');
+        out.push(next);
+        i++; // skip next
+        continue;
+      } else {
+        // fallback: decode normally
+        out.push('hi');
+        continue;
+      }
+    }
+    if (isCapitalizedName(tk)){
+      out.push(tk);
+      continue;
+    }
+    // decode character-by-character
+    let dec = '';
+    for (let ch of tk){
+      dec += decipherMap[ch] || ch;
+    }
+    out.push(dec);
+  }
+  return out.join('');
+}
+
+// Utilities
+function isCapitalizedName(token){
+  // treat as name if token is letters only and starts with uppercase
+  return /^[A-Z][a-zA-Z]{1,}$/.test(token);
+}
+function isGreeting(token){
+  if (!token) return false;
+  const g = token.toLowerCase();
+  return g === 'hi' || g === 'hello' || g === 'hey' || g === 'hiya';
+}
+
+// Split preserving punctuation and spaces as tokens so we can operate on words
+function splitPreserve(s){
+  // We want tokens that are either:
+  // - contiguous letters/digits/punct (no spaces)
+  // - or single space characters
+  const tokens = [];
+  let cur = '';
+  for (let ch of s){
+    if (ch === ' '){
+      if (cur !== '') { tokens.push(cur); cur=''; }
+      tokens.push(' ');
+    } else {
+      cur += ch;
+    }
+  }
+  if (cur !== '') tokens.push(cur);
+  return tokens;
+}
+
+// ---------- UI wiring ----------
+const inputEl = document.getElementById('inputText');
+const outEl = document.getElementById('translatedText');
+const sampleEl = document.getElementById('sampleEnglish');
+const overlay = document.getElementById('overlay');
+const toDevBtn = document.getElementById('toDevBtn');
+const toEngBtn = document.getElementById('toEngBtn');
+const swapBtn = document.getElementById('swapBtn');
+const copyBtn = document.getElementById('copyBtn');
+const cipherId = document.getElementById('cipherId');
+
+cipherId.textContent = "seed:" + (SEED_PHRASE);
+
+// small helper to animate translation with a short delay to show "Translating..."
+function showTranslating(fn){
+  overlay.classList.add('show');
+  // emulate asynchronous work for small UX pause (125-600ms)
+  const delay = 520; // long enough to see animation but short overall
+  setTimeout(()=>{
+    try { fn(); } finally { overlay.classList.remove('show'); }
+  }, delay);
+}
+
+function translateToDev(){
+  const text = inputEl.value || '';
+  sampleEl.textContent = text;
+  showTranslating(()=>{
+    const translated = encodeText(text);
+    outEl.textContent = translated;
+  });
+}
+
+function translateToEnglish(){
+  const text = inputEl.value || '';
+  sampleEl.textContent = text;
+  showTranslating(()=>{
+    const translated = decodeText(text);
+    outEl.textContent = translated;
+  });
+}
+
+toDevBtn.addEventListener('click', ()=>{
+  // move caret out of textarea then translate
+  inputEl.blur();
+  translateToDev();
+});
+toEngBtn.addEventListener('click', ()=>{
+  inputEl.blur();
+  translateToEnglish();
+});
+swapBtn.addEventListener('click', ()=>{
+  const prevOut = outEl.textContent || '';
+  const prevIn = inputEl.value || '';
+  inputEl.value = prevOut || prevIn;
+  sampleEl.textContent = inputEl.value;
+});
+copyBtn.addEventListener('click', async ()=>{
+  try {
+    const text = outEl.textContent || '';
+    await navigator.clipboard.writeText(text);
+    copyBtn.textContent = "Copied ✓";
+    setTimeout(()=> copyBtn.textContent = "Copy", 1400);
+  } catch(e){
+    copyBtn.textContent = "Copy";
+  }
+});
+
+// initialize preview
+(function init(){
+  sampleEl.textContent = inputEl.value;
+  outEl.textContent = encodeText(inputEl.value);
 })();
-
-function encodeWord(word){
-  return word.split('').map(ch => cipher[ch] || ch).join('');
-}
-
-function decodeWord(word){
-  return word.split('').map(ch => decipher[ch] || ch).join('');
-}
-
-function toDev(){
-  const input = document.getElementById("inputText").value.trim();
-  if (!input) return;
-  const words = input.split(' ');
-  const result = words.map(w => {
-    if (w.toLowerCase() === 'hi') return '(language hi)';
-    if (/^[A-Z][a-z]+$/.test(w)) return w; // preserve names like David
-    return encodeWord(w);
-  }).join(' ');
-  document.getElementById("output").innerText = result;
-}
-
-function toEnglish(){
-  const input = document.getElementById("inputText").value.trim();
-  if (!input) return;
-  const words = input.split(' ');
-  const result = words.map(w => {
-    if (w === '(language' || w === 'hi)') return 'hi';
-    if (/^[A-Z][a-z]+$/.test(w)) return w; // preserve names
-    return decodeWord(w);
-  }).join(' ');
-  document.getElementById("output").innerText = result;
-}
 </script>
 </body>
 </html>
