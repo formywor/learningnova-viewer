@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev Language Translator — ScriptNova</title>
+<style>
+  :root {
+    --bg: #0a0f1c;
+    --panel: #10192b;
+    --accent: #00d4ff;
+    --accent2: #8f00ff;
+    --text: #e5e7eb;
+  }
+  body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: radial-gradient(circle at top left, var(--bg), #06080f);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  h1 {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2em;
+    margin-bottom: 20px;
+    animation: pulse 3s infinite alternate;
+  }
+  @keyframes pulse {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+  }
+  .container {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 700px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+  }
+  textarea {
+    width: 100%;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 10px;
+    color: var(--text);
+    padding: 10px;
+    resize: none;
+    font-size: 1em;
+    outline: none;
+  }
+  button {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    transition: 0.3s;
+    margin: 10px 5px;
+  }
+  button:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+  }
+  .output {
+    margin-top: 10px;
+    font-size: 1.05em;
+    word-break: break-word;
+    color: #00eaff;
+  }
+  .note {
+    font-size: 0.8em;
+    opacity: 0.6;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<h1>Dev Language Translator</h1>
+<div class="container">
+  <textarea id="inputText" placeholder="Type something like: hi zainab"></textarea>
+  <div>
+    <button onclick="toDev()">Translate to Dev Language</button>
+    <button onclick="toEnglish()">Translate to English</button>
+  </div>
+  <div id="output" class="output"></div>
+  <div class="note">🔒 Only this site can translate Dev Language. It’s dynamically encrypted with ScriptNova’s Dev Cipher.</div>
+</div>
+
+<script>
+// Create an extremely obfuscated cipher (random per session)
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?";
+let cipher = {};
+let decipher = {};
+(function generateCipher(){
+  let shuffled = charset.split('').sort(()=>Math.random()-0.5).join('');
+  for (let i=0; i<charset.length; i++) {
+    cipher[charset[i]] = shuffled[i];
+    decipher[shuffled[i]] = charset[i];
+  }
+})();
+
+function encodeWord(word){
+  return word.split('').map(ch => cipher[ch] || ch).join('');
+}
+
+function decodeWord(word){
+  return word.split('').map(ch => decipher[ch] || ch).join('');
+}
+
+function toDev(){
+  const input = document.getElementById("inputText").value.trim();
+  if (!input) return;
+  const words = input.split(' ');
+  const result = words.map(w => {
+    if (w.toLowerCase() === 'hi') return '(language hi)';
+    if (/^[A-Z][a-z]+$/.test(w)) return w; // preserve names like David
+    return encodeWord(w);
+  }).join(' ');
+  document.getElementById("output").innerText = result;
+}
+
+function toEnglish(){
+  const input = document.getElementById("inputText").value.trim();
+  if (!input) return;
+  const words = input.split(' ');
+  const result = words.map(w => {
+    if (w === '(language' || w === 'hi)') return 'hi';
+    if (/^[A-Z][a-z]+$/.test(w)) return w; // preserve names
+    return decodeWord(w);
+  }).join(' ');
+  document.getElementById("output").innerText = result;
+}
+</script>
+</body>
+</html>
